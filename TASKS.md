@@ -13,7 +13,7 @@
   * Define and export the `AppState` interface with fields: `todos: Todo[]`, `filter: FilterState`, `editingId: string | null`.
   * **Tests:** Assert that `Priority` and `TodoStatus` union types are exported and correctly defined. Verify that a mock object matching the `Todo` interface structure contains all required keys and correctly typed values. Ensure `npx tsc --noEmit` passes with zero errors in the test file.
 
-- [x] **Task 2: Implement the ID Generation Utility**
+- [ ] **Task 2: Implement the ID Generation Utility**
   * Create `src/utils/id.ts` and export a single function `generateId(): string`.
   * Implement the function using `crypto.randomUUID()` — no external libraries, no `Math.random()`.
   * Ensure the function return type is explicitly annotated as `string`.
