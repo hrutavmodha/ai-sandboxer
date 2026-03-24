@@ -1,4 +1,5 @@
 export type Priority = 'low' | 'medium' | 'high';
+
 export type TodoStatus = 'pending' | 'completed';
 
 export interface Todo {
