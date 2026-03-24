@@ -111,6 +111,8 @@ def init_reviewer_agent():
     )
 
 def init_workflow():
+    os.system('sudo -u gemini-agent git config --global user.name "Hrutav Modha"')
+    os.system('sudo -u gemini-agent git config --global user.email "modhahrutav@gmail.com"')
     if not os.path.exists("tests"):
         os.makedirs("tests")
     if not os.path.exists("src"):
