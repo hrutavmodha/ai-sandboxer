@@ -40,7 +40,7 @@
   * Export both from `src/store/index.ts`.
   * **Tests:** Call `saveState` with a valid `AppState`, then call `loadState` and assert the returned object deeply equals the saved object. Call `loadState` on a fresh `localStorage` and assert `null` is returned. Simulate a corrupt JSON string in `localStorage` and assert `loadState` returns `null` without throwing.
 
-- [ ] **Task 5: Define the Default Application State**
+- [x] **Task 5: Define the Default Application State**
   * Create `src/store/defaultState.ts` and export a function `getDefaultState(): AppState`.
   * The returned object must have: `todos: []`, `filter: { status: 'all', priority: 'all', searchQuery: '' }`, `editingId: null`.
   * The function must return a new object on every call (no shared mutable reference).
