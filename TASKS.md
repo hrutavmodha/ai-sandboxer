@@ -67,7 +67,7 @@
   * Export all six from `src/store/index.ts`.
   * **Tests:** For each action, call it with valid arguments and assert `getState()` reflects the expected change. Test `removeTodo` with a non-existent ID and assert state is unchanged. Test `toggleTodo` twice on the same todo and assert it returns to `'pending'` with `completedAt: null`.
 
-- [ ] **Task 8: Implement the Derived Selector for Filtered Todos**
+- [x] **Task 8: Implement the Derived Selector for Filtered Todos**
   * Create `src/store/selectors.ts` and export `getFilteredTodos(state: AppState): Todo[]`.
   * Apply `status` filter: if `state.filter.status` is not `'all'`, keep only todos where `todo.status === state.filter.status`.
   * Apply `priority` filter: if `state.filter.priority` is not `'all'`, keep only todos where `todo.priority === state.filter.priority`.
