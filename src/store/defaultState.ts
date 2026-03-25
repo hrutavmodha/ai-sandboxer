@@ -1,4 +1,4 @@
-import { AppState } from '../types';
+import type { AppState } from '../types';
 
 /**
  * Returns a new instance of the default application state.

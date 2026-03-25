@@ -1,4 +1,4 @@
-import { AppState } from '../types';
+import type { AppState } from '../types';
 import { loadState, saveState } from './persistence';
 import { getDefaultState } from './defaultState';
 

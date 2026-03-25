@@ -56,7 +56,7 @@
   * Export all four from `src/store/index.ts`.
   * **Tests:** Call `setState` with an updater that appends a todo, then call `getState` and assert the todo is present. Subscribe a callback, call `setState`, and assert the callback was invoked exactly once. Call the returned unsubscribe function, call `setState` again, and assert the callback was NOT invoked a second time.
 
-- [ ] **Task 7: Implement All Todo Mutation Actions**
+- [x] **Task 7: Implement All Todo Mutation Actions**
   * Create `src/store/actions.ts`. All functions here call `setState` internally.
   * `addTodo(title: string, description: string, priority: Priority, dueDate: number | null): void` — creates a new `Todo` using `generateId()` and `getNow()`, with `status: 'pending'` and `completedAt: null`, and spreads it into `state.todos`.
   * `removeTodo(id: string): void` — returns a new state where `todos` is filtered to exclude the todo with the matching `id`.
