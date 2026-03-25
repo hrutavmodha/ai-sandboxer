@@ -21,7 +21,7 @@
   * In `src/main.ts`, call `generateId()` twice in sequence and `console.log` both values to manually verify they are different UUID strings during dev. Remove after verification.
   * **Tests:** Call `generateId()` 1000 times in a test loop and assert that all returned values are unique strings matching the UUID v4 regex `/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i`.
 
-- [ ] **Task 3: Implement Date Utility Functions**
+- [x] **Task 3: Implement Date Utility Functions**
   * Create `src/utils/date.ts` and export three functions: `getNow(): number`, `formatDate(timestamp: number): string`, and `isOverdue(dueDate: number | null): boolean`.
   * `getNow` returns `Date.now()`.
   * `formatDate` converts a Unix timestamp (ms) to a human-readable string using `Intl.DateTimeFormat` with options `{ year: 'numeric', month: 'short', day: 'numeric' }`. It must never use external libraries.
