@@ -88,7 +88,7 @@
   * Set `app.innerHTML` to the string `'<p>App mounting...</p>'` to confirm DOM access works, then remove it.
   * **Tests:** In a JSDOM environment, assert that `document.getElementById('app')` is not null after `index.html` is parsed. Assert that removing `#app` from the DOM and re-running the bootstrap throws the expected error.
 
-- [ ] **Task 10: Implement the `createElement` DOM Utility**
+- [x] **Task 10: Implement the `createElement` DOM Utility**
   * Create `src/utils/dom.ts` and export a function `createElement<K extends keyof HTMLElementTagNameMap>(tag: K, classes?: string[], attributes?: Record<string, string>): HTMLElementTagNameMap[K]`.
   * The function calls `document.createElement(tag)`, then if `classes` is non-empty, sets `el.className = classes.join(' ')`, then iterates `attributes` and calls `el.setAttribute(key, value)` for each pair, then returns `el`.
   * Export `createElement` from `src/utils/index.ts`.
