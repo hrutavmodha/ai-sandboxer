@@ -33,7 +33,7 @@
 
 ## Phase 2: State Management (Store)
 
-- [ ] **Task 4: Implement LocalStorage Persistence Utilities**
+- [x] **Task 4: Implement LocalStorage Persistence Utilities**
   * Create `src/store/persistence.ts` and export two functions: `saveState(state: AppState): void` and `loadState(): AppState | null`.
   * `saveState` serializes `state` via `JSON.stringify` and writes it to `localStorage` under the key `'todo-app-state'`. Wrap the call in a `try/catch` — on error, `console.error` the error and do nothing else (do not re-throw).
   * `loadState` reads from `localStorage` under `'todo-app-state'`. If the key is missing, return `null`. If `JSON.parse` throws, `console.error` the error and return `null`. Otherwise, return the parsed value cast as `AppState`.
