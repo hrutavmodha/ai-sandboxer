@@ -47,7 +47,7 @@
   * Export `getDefaultState` from `src/store/index.ts`.
   * **Tests:** Call `getDefaultState()` twice and assert the two returned objects are deeply equal but not the same reference (`!==`).
 
-- [ ] **Task 6: Implement the State Store with Subscriber Pattern**
+- [x] **Task 6: Implement the State Store with Subscriber Pattern**
   * Create `src/store/store.ts`. Define a module-level variable `let state: AppState` initialized by calling `loadState() ?? getDefaultState()`.
   * Define a `Set` of subscriber callbacks: `const subscribers = new Set<() => void>()`.
   * Export `getState(): AppState` — returns a shallow clone of state via `{ ...state }`.
