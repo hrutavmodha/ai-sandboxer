@@ -80,7 +80,7 @@
 
 ## Phase 3: UI Component Architecture
 
-- [ ] **Task 9: Bootstrap the Root HTML Shell**
+- [x] **Task 9: Bootstrap the Root HTML Shell**
   * Replace the entire body content of `index.html` with a single `<div id="app"></div>`.
   * Add `<meta name="viewport" content="width=device-width, initial-scale=1.0">` if not already present.
   * Set `<title>` to `Todo App`.
