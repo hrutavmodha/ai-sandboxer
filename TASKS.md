@@ -94,7 +94,7 @@
   * Export `createElement` from `src/utils/index.ts`.
   * **Tests:** Call `createElement('button', ['btn', 'btn-primary'], { 'data-id': '123', 'aria-label': 'Close' })` and assert the returned element is an `HTMLButtonElement`, has className `'btn btn-primary'`, and has the correct attribute values.
 
-- [ ] **Task 11: Implement the Header Component**
+- [x] **Task 11: Implement the Header Component**
   * Create `src/components/Header.ts` and export a default function `Header(): HTMLElement`.
   * The function builds and returns a `<header>` element containing an `<h1>` with the text `My Todos` and a `<p>` subtitle with the text `Stay organized, stay productive.`
   * Apply Tailwind classes directly on the elements. The header must have a bottom border. The `<h1>` must use a large bold font. No inline styles — only Tailwind utility classes via `className`.
