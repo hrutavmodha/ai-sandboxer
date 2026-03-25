@@ -130,17 +130,15 @@ def restore_permissions():
     os.system("sudo chown -R hrutav-modha:hrutav-modha .")
     print("Permissions restored.")
 
-MAX_CYCLES = 1
-
-for i in range(MAX_CYCLES):
+for i in range(10):
     if os.path.exists("REVIEW.md"):
         with open("REVIEW.md", "r") as f:
             if "Found same bug again" in f.read():
                 print("\n[STOP] Same bug found again in REVIEW.md. Breaking workflow.\n")
                 break
     try:
-        print(f"\nStarting iteration {i + 1}\n")
         init_workflow()
+        print(f"\nStarting iteration {i + 1}\n")
         init_dev_agent()
         init_test_agent()
         init_reviewer_agent()
