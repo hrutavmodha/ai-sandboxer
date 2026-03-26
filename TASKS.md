@@ -1,10 +1,10 @@
 # 📋 To-Do List Application — Development Roadmap
-Stack: HTML · Tailwind CSS · TypeScript · Vite · Vitest (JSDOM)
+Stack: HTML · Tailwind CSS · TypeScript · Vite · Vitest
 
 ## Phase 1: Project Setup & Dev Environment (Anti-Cheat Foundation)
 
 - [x] **Task 1: Manually Scaffold Vite + TypeScript Project**
-  * Do NOT use the `create-vite` CLI. Create the boilerplate files manually.
+  * Do not use the `create-vite` CLI. Create the boilerplate files manually.
   * Create `package.json` with `"type": "module"`, scripts for `"dev": "vite"`, `"build": "tsc && vite build"`, and `devDependencies` including `"vite"`, `"typescript"`, `"vitest"`, and `"jsdom"`.
   * Create a standard `tsconfig.json` for a Vite environment (strict mode enabled, target ESNext).
   * Create `index.html` in the root referencing `<script type="module" src="/src/main.ts"></script>`.

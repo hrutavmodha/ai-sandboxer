@@ -1,5 +1,5 @@
-console.log('App mounting...');
-const app = document.getElementById('app');
+console.log('App initialization started...');
+const app = document.querySelector<HTMLDivElement>('#app');
 if (app) {
-  app.innerHTML = '<h1>Hello Vite + TypeScript!</h1>';
+  app.innerHTML = '<h1>Hello, Vibe!</h1>';
 }
