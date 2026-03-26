@@ -1,18 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
-import { execSync } from 'node:child_process';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
+import { execSync } from 'child_process';
 
-describe('Task 1: Project Setup & Dev Environment', () => {
+describe('Task 1: Project Scaffolding', () => {
   it('should have index.html in the root', () => {
-    expect(existsSync(join(process.cwd(), 'index.html'))).toBe(true);
+    const filePath = resolve(__dirname, '../index.html');
+    expect(existsSync(filePath)).toBe(true);
   });
 
   it('should have src/main.ts', () => {
-    expect(existsSync(join(process.cwd(), 'src/main.ts'))).toBe(true);
+    const filePath = resolve(__dirname, '../src/main.ts');
+    expect(existsSync(filePath)).toBe(true);
   });
 
-  it('should pass TypeScript compilation with no errors', () => {
+  it('should pass typescript compilation (tsc --noEmit)', () => {
     try {
       execSync('npm exec tsc --noEmit', { stdio: 'pipe' });
     } catch (error: any) {
