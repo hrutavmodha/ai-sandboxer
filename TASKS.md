@@ -20,7 +20,7 @@ Stack: HTML · Tailwind CSS · TypeScript · Vite · Vitest (JSDOM)
   * **Tests:** Add a temporary `div` with `class="bg-red-500"` in `index.html`. Start the dev server and assert via curl or visually that the Tailwind classes are compiled and applied.
 
 - [ ] **Task 3: Pre-bake the Testing Environment (Vitest + JSDOM)**
-  * Install `vitest` and `jsdom` as dev dependencies. (Crucial: Do not let agents bypass this).
+  * Install `vitest` and `jsdom` as dev dependencies.
   * Create `vitest.config.ts` in the project root and configure it to use the JSDOM environment globally (`test: { environment: 'jsdom' }`).
   * Add a `test` script to `package.json` pointing to `vitest run`.
   * **Tests:** Create a dummy test file `tests/env.test.ts`. Write a test asserting that `typeof window !== 'undefined'` and `typeof document !== 'undefined'`. Run `npm run test` and assert it passes without any manual DOM mocking.
