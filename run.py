@@ -1,152 +1,152 @@
-import os
+import subprocess
 import sys
+import logging
+from pathlib import Path
 
-def lock_file(path):
-    if os.path.exists(path):
-        ret = os.system(f"sudo setfacl -m u:gemini-agent:--- {path}")
-        if ret != 0:
-            print(f"[ERROR] Failed to lock {path} — aborting!")
-            sys.exit(1)
-        print(f"{path} locked for gemini-agent")
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+AGENT_USER = "gemini-agent"
+HOST_USER = "hrutav-modha"
+GEMINI_CLI = "/usr/local/nodejs/bin/gemini"
+MAX_CYCLES = 1
 
-def read_file(path):
-    if os.path.exists(path):
-        ret = os.system(f"sudo setfacl -m u:gemini-agent:r {path}")
-        if ret != 0:
-            print(f"[ERROR] Failed to read-only {path} — aborting!")
+class PermissionManager:
+    @staticmethod
+    def _run_acl(cmd: list):
+        try:
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            logging.error(f"Failed to execute ACL command: {' '.join(cmd)} — aborting!")
             sys.exit(1)
-        print(f"{path} read-only for gemini-agent")
 
-def write_file(path):
-    if os.path.exists(path):
-        ret = os.system(f"sudo setfacl -m u:gemini-agent:rwx {path}")
-        if ret != 0:
-            print(f"[ERROR] Failed to write-access {path} — aborting!")
-            sys.exit(1)
-        print(f"{path} write-access for gemini-agent")
+    @classmethod
+    def lock(cls, path: str, is_dir=False):
+        if Path(path).exists():
+            cls._run_acl(["sudo", "setfacl", "-m", f"u:{AGENT_USER}:---", path])
+            if is_dir:
+                cls._run_acl(["sudo", "setfacl", "-R", "-d", "-m", f"u:{AGENT_USER}:---", path])
+            logging.info(f"Locked: {path}")
 
-def lock_dir(path):
-    if os.path.exists(path):
-        ret  = os.system(f"sudo setfacl -R -m u:gemini-agent:--- {path}")
-        ret2 = os.system(f"sudo setfacl -R -d -m u:gemini-agent:--- {path}")
-        if ret != 0 or ret2 != 0:
-            print(f"[ERROR] Failed to lock {path} — aborting!")
-            sys.exit(1)
-        print(f"{path} locked for gemini-agent")
+    @classmethod
+    def read_only(cls, path: str, is_dir=False):
+        if Path(path).exists():
+            perm = "rx" if is_dir else "r"
+            cls._run_acl(["sudo", "setfacl", "-R", "-m", f"u:{AGENT_USER}:{perm}", path])
+            if is_dir:
+                cls._run_acl(["sudo", "setfacl", "-R", "-d", "-m", f"u:{AGENT_USER}:{perm}", path])
+            logging.info(f"Read-Only: {path}")
 
-def read_dir(path):
-    if os.path.exists(path):
-        ret  = os.system(f"sudo setfacl -R -m u:gemini-agent:rx {path}")
-        ret2 = os.system(f"sudo setfacl -R -d -m u:gemini-agent:rx {path}")
-        if ret != 0 or ret2 != 0:
-            print(f"[ERROR] Failed to read-only {path} — aborting!")
-            sys.exit(1)
-        print(f"{path} read-only for gemini-agent")
+    @classmethod
+    def write_access(cls, path: str, is_dir=False):
+        if Path(path).exists():
+            cls._run_acl(["sudo", "setfacl", "-R", "-m", f"u:{AGENT_USER}:rwx", path])
+            if is_dir:
+                cls._run_acl(["sudo", "setfacl", "-R", "-d", "-m", f"u:{AGENT_USER}:rwx", path])
+            logging.info(f"Write-Access: {path}")
 
-def write_dir(path):
-    if os.path.exists(path):
-        ret  = os.system(f"sudo setfacl -R -m u:gemini-agent:rwx {path}")
-        ret2 = os.system(f"sudo setfacl -R -d -m u:gemini-agent:rwx {path}")
-        if ret != 0 or ret2 != 0:
-            print(f"[ERROR] Failed to write-access {path} — aborting!")
-            sys.exit(1)
-        print(f"{path} write-access for gemini-agent")
+    @classmethod
+    def restore_all(cls):
+        try:
+            subprocess.run(["sudo", "setfacl", "-R", "-m", f"u:{HOST_USER}:rwx", "."], check=True)
+            subprocess.run(["sudo", "chown", "-R", f"{HOST_USER}:{HOST_USER}", "."], check=True)
+            logging.info("Host permissions restored fully.")
+        except subprocess.CalledProcessError:
+            logging.error("Failed to restore host permissions.")
+
+def run_agent(agent_name: str, prompt: str):
+    logging.info(f"Starting {agent_name} Agent...")
+    cmd = [
+        "sudo", "-u", AGENT_USER, 
+        GEMINI_CLI, "-p", prompt, "--yolo"
+    ]
+    try:
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError:
+        logging.warning(f"{agent_name} Agent encountered an error or exited non-zero.")
 
 def init_dev_agent():
-    lock_dir("tests/")
-    read_file("REVIEW.md")
-    read_file("TASKS.md")
-    write_dir("src/")
-    write_file("index.html")
-    print("Starting Developer Agent")
-    os.system(
-        'sudo -u gemini-agent '
-        '/usr/local/nodejs/bin/gemini -p '
-        '"You are Developer Agent. '
-        '1. Check REVIEW.md: If it contains a bug description, fix that bug in src/ and STOP. '
-        '2. Otherwise, find the FIRST unticked task in TASKS.md and implement it in src/. '
-        'DO NOT mark the task as done in TASKS.md. '
-        '3. Do not execute or write the test cases. '
-        'GOAL: Implement functional code for the next task or fix. STOP after completing one task" '
-        '--yolo'
+    PermissionManager.lock("tests/", is_dir=True)
+    PermissionManager.read_only("REVIEW.md")
+    PermissionManager.read_only("TASKS.md")
+    PermissionManager.write_access("src/", is_dir=True)
+    PermissionManager.write_access("index.html")
+    
+    prompt = (
+        "1. You are Developer Agent. "
+        "2. Check REVIEW.md: If there is a bug, fix it in src/ and STOP. "
+        "3. Else, implement the first unticked task from TASKS.md in src/. "
+        "4. Do not mark the task as done. "
+        "5. Write pure, functional code. No '// TODO' or partial implementations. "
+        "6. Do not implement whatever is given in `Tests` section of the **Task**"
     )
+    run_agent("Developer", prompt)
 
 def init_test_agent():
-    lock_dir("src/")
-    lock_file("index.html")
-    read_file("REVIEW.md")
-    read_file("TASKS.md")
-    write_dir("tests/")
-    print("Starting Tester Agent")
-    os.system(
-        'sudo -u gemini-agent '
-        '/usr/local/nodejs/bin/gemini -p '
-        '"You are Tester Agent. '
-        '1. Check REVIEW.md: If it contains a bug description, write test cases in tests/ that reproduce that bug and STOP. '
-        '2. Otherwise, find the FIRST unticked task in TASKS.md and strictly implement the test cases defined in its \'Tests:\' section. '
-        'DO NOT read src/. STOP after writing tests for one bug or task." '
-        '--yolo'
+    PermissionManager.lock("src/", is_dir=True)
+    PermissionManager.lock("index.html")
+    PermissionManager.read_only("REVIEW.md")
+    PermissionManager.read_only("TASKS.md")
+    PermissionManager.write_access("tests/", is_dir=True)
+    
+    prompt = (
+        "1. You are Tester Agent. "
+        "2. Check REVIEW.md: If there's a bug, write tests in tests/ to reproduce it and STOP. " 
+        "3. Else, strictly implement the test cases for the first unticked task in TASKS.md. "
+        "4. Stop after writing tests. Do not run the test suite."
     )
+    run_agent("Tester", prompt)
 
 def init_reviewer_agent():
-    read_dir("src/")
-    read_file("index.html")
-    read_dir("tests/")
-    write_dir(".git/")
-    write_file("TASKS.md")
-    write_file("REVIEW.md")
-    print("Starting Reviewer Agent")
-    os.system(
-        'sudo -u gemini-agent '
-        '/usr/local/nodejs/bin/gemini -p '
-        '"You are Reviewer Agent. '
-        '1. Run the test suite (e.g., \'npx vitest run\'). '
-        '2. If tests FAIL: Compare the failure/error to the current content of REVIEW.md. '
-        'If it is the SAME bug or failure, write REVIEW.md starting with \'Found same bug again\' followed by the description. '
-        'Otherwise, write the new bug description and logs to REVIEW.md. STOP. '
-        '3. If tests PASS: Mark the first unticked task in TASKS.md as done ([x]), clear REVIEW.md, '
-        'run \'git add .\' and \'git commit -m \\\"feat: complete task X\\\"\' and STOP. '
-        'DO NOT modify src/ or tests/." '
-        '--yolo'
+    PermissionManager.read_only("src/", is_dir=True)
+    PermissionManager.read_only("index.html")
+    PermissionManager.read_only("tests/", is_dir=True)
+    PermissionManager.write_access(".git/", is_dir=True)
+    PermissionManager.write_access("TASKS.md")
+    PermissionManager.write_access("REVIEW.md")
+    
+    prompt = (
+        "You are Reviewer Agent. "
+        "1. Run the tests using 'npm run test' or 'npx vitest run'. "
+        "2. If tests FAIL: Check if REVIEW.md has the same bug. If yes, write 'Found same bug again' at the top of REVIEW.md and STOP."
+        "Else, write the new bug and logs to REVIEW.md. STOP. "
+        "4. If tests PASS: Mark task as done ([x]) in TASKS.md, clear REVIEW.md, "
+        "run 'git add .' and 'git commit -m \"feat: [task description]\"' and STOP."
     )
+    run_agent("Reviewer", prompt)
 
 def init_workflow():
-    os.system('sudo -u gemini-agent git config --global user.name "Hrutav Modha"')
-    os.system('sudo -u gemini-agent git config --global user.email "modhahrutav@gmail.com"')
-    if not os.path.exists("tests"):
-        os.makedirs("tests")
-    if not os.path.exists("src"):
-        os.makedirs("src")
-    if not os.path.exists("REVIEW.md"):
-        with open("REVIEW.md", "w") as f:
-            f.write("# Review\n")
-    if os.path.exists("node_modules"):
-        os.system("sudo setfacl -R -m u:gemini-agent:rx node_modules/")
+    subprocess.run(['sudo', '-u', AGENT_USER, 'git', 'config', '--global', 'user.name', 'AI Agent Orchestrator'])
+    subprocess.run(['sudo', '-u', AGENT_USER, 'git', 'config', '--global', 'user.email', 'ai@orchestrator.local'])
+    
+    Path("tests").mkdir(exist_ok=True)
+    Path("src").mkdir(exist_ok=True)
+    
+    review_file = Path("REVIEW.md")
+    if not review_file.exists():
+        review_file.write_text("# Review\n")
+        
+    if Path("node_modules").exists():
+        PermissionManager.read_only("node_modules/", is_dir=True)
 
-    lock_file("run.py")
+    PermissionManager.lock("run.py")
 
-def restore_permissions():
-    os.system("sudo setfacl -R -m u:hrutav-modha:rwx .")
-    os.system("sudo chown -R hrutav-modha:hrutav-modha .")
-    print("Permissions restored.")
+if __name__ == "__main__":
+    for i in range(MAX_CYCLES):
+        review_content = Path("REVIEW.md").read_text() if Path("REVIEW.md").exists() else ""
+        if "Found same bug again" in review_content or "Cheating detected" in review_content:
+            logging.warning("\n[STOP] Infinite Loop or AI Cheating detected in REVIEW.md. Breaking workflow.\n")
+            break
+            
+        try:
+            logging.info(f"\n--- Starting Iteration {i + 1} ---")
+            init_workflow()
+            init_dev_agent()
+            init_test_agent()
+            init_reviewer_agent()
+        except KeyboardInterrupt:
+            logging.info("\nInterrupted by user. Cleaning up...")
+            break
+        finally:
+            PermissionManager.restore_all()
 
-for i in range(10):
-    if os.path.exists("REVIEW.md"):
-        with open("REVIEW.md", "r") as f:
-            if "Found same bug again" in f.read():
-                print("\n[STOP] Same bug found again in REVIEW.md. Breaking workflow.\n")
-                break
-    try:
-        init_workflow()
-        print(f"\nStarting iteration {i + 1}\n")
-        init_dev_agent()
-        init_test_agent()
-        init_reviewer_agent()
-    except KeyboardInterrupt:
-        print("\nInterrupted by user.")
-        break
-    finally:
-        restore_permissions()
-
-print("\nAll iterations completed.")
-sys.exit(0)
+    logging.info("\nWorkflow completely executed.")
+    sys.exit(0)
