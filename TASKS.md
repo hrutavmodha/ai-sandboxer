@@ -14,7 +14,7 @@ Stack: HTML · Tailwind CSS · TypeScript · Vite · Vitest
 
 - [ ] **Task 2: Install & Configure Tailwind CSS**
   * Install Tailwind CSS, PostCSS, and Autoprefixer as dev dependencies using `npm install -D tailwindcss postcss autoprefixer`.
-  * Initialize the configuration files silently using `npx tailwindcss init -p`.
+  * Initialize the configuration files silently using `npm exec tailwindcss init -p`.
   * Update `tailwind.config.js` to scan for classes in all HTML and TS files (`content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}']`).
   * Create `src/styles/main.css` and add the three Tailwind directives (`@tailwind base; @tailwind components; @tailwind utilities;`).
   * **Tests:** Add a temporary `div` with `class="bg-red-500"` in `index.html`. Start the dev server and assert via curl or visually that the Tailwind classes are compiled and applied.
@@ -33,7 +33,7 @@ Stack: HTML · Tailwind CSS · TypeScript · Vite · Vitest
   * Define and export the `Todo` interface with fields: `id: string`, `title: string`, `description: string`, `priority: Priority`, `status: TodoStatus`, `createdAt: number`, `completedAt: number | null`, `dueDate: number | null`.
   * Define and export the `FilterState` interface with fields: `status: TodoStatus | 'all'`, `priority: Priority | 'all'`, `searchQuery: string`.
   * Define and export the `AppState` interface with fields: `todos: Todo[]`, `filter: FilterState`, `editingId: string | null`.
-  * **Tests:** Assert that `Priority` and `TodoStatus` union types are exported and correctly defined. Verify that a mock object matching the `Todo` interface structure contains all required keys and correctly typed values. Ensure `npx tsc --noEmit` passes with zero errors in the test file.
+  * **Tests:** Assert that `Priority` and `TodoStatus` union types are exported and correctly defined. Verify that a mock object matching the `Todo` interface structure contains all required keys and correctly typed values. Ensure `npm exec tsc --noEmit` passes with zero errors in the test file.
 
 - [ ] **Task 5: Implement the ID Generation Utility**
   * Create `src/utils/id.ts` and export a single function `generateId(): string`.
@@ -222,9 +222,9 @@ Stack: HTML · Tailwind CSS · TypeScript · Vite · Vitest
   * In `vite.config.ts`, add a `build` config object with: `outDir: 'dist'`, `sourcemap: false`, `minify: 'esbuild'`, `target: 'es2020'`.
   * In `vite.config.ts`, set `base: './'` so asset paths are relative (correct for `file://` serving and sub-path hosting).
   * In `tsconfig.json`, ensure `"noUnusedLocals": true` and `"noUnusedParameters": true` are set so the build fails on dead code.
-  * Run `npx tsc --noEmit` and fix any type errors until the command exits cleanly.
+  * Run `npm exec tsc --noEmit` and fix any type errors until the command exits cleanly.
   * Run `npm run build` and assert the output `dist/` folder contains `index.html`, at least one `.js` file, and at least one `.css` file.
-  * **Tests:** Open `dist/index.html` in a browser (or serve it with `npx serve dist`) and perform a manual smoke test: add a todo, toggle it, filter by completed, verify it appears, delete it, verify it disappears, refresh the page, and verify the completed todo is gone (since it was deleted) and the state persists from `localStorage`.
+  * **Tests:** Open `dist/index.html` in a browser (or serve it with `npm exec serve dist`) and perform a manual smoke test: add a todo, toggle it, filter by completed, verify it appears, delete it, verify it disappears, refresh the page, and verify the completed todo is gone (since it was deleted) and the state persists from `localStorage`.
 
 - [ ] **Task 27: Validate Full LocalStorage Round-Trip on Page Reload**
   * Add 3 todos via the `AddTodoForm` in the running app (dev server).
