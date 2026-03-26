@@ -1,11 +1,5 @@
-const root = document.getElementById('app');
-
-if (!root) {
-  throw new Error('Root element #app not found');
+console.log('App mounting...');
+const app = document.getElementById('app');
+if (app) {
+  app.innerHTML = '<h1>Hello Vite + TypeScript!</h1>';
 }
-
-const app: HTMLElement = root;
-
-// Temporary confirmation of DOM access
-app.innerHTML = '<p>App mounting...</p>';
-app.innerHTML = '';
