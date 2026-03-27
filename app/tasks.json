@@ -12,7 +12,7 @@
     "roadmap": [
         {
             "id": 1,
-            "description": "Project Setup & Dev Environment (Anti-Cheat Foundation)",
+            "description": "Project Setup & Dev Environment",
             "tasks": [
                 {
                     "id": 1,
@@ -23,7 +23,7 @@
                         "Create index.html and src/main.ts",
                         "Run npm install silently"
                     ],
-                    "completed": true
+                    "completed": false
                 },
                 {
                     "id": 2,
