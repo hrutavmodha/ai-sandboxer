@@ -1,24 +1,24 @@
-interface Task {
+export interface Task {
     id: number,
     description: string,
     details: Array<string>,
     completed: boolean
 }
 
-interface Phase {
+export interface Phase {
     id: number,
     description: string,
     tasks: Array<Task>
 }
 
-interface Project {
+export interface Project {
     name: string,
     description: string,
     techStacks: Array<string>,
     roadmap: Array<Phase>
 }
 
-interface Bug {
+export interface Bug {
     id: number,
     description: string,
     details: Array<string>,
@@ -26,4 +26,4 @@ interface Bug {
     fixed: boolean
 }
 
-type Bugs = Array<Bug>
+export type Bugs = Array<Bug>

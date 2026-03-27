@@ -13,7 +13,7 @@ MAX_CYCLES = 10
 
 class PermissionManager:
     @staticmethod
-    def _run_acl(cmd: list):
+    def _run_acl(cmd):
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError:
@@ -21,7 +21,7 @@ class PermissionManager:
             sys.exit(1)
 
     @classmethod
-    def lock(cls, path: str, is_dir=False):
+    def lock(cls, path, is_dir=False):
         if Path(path).exists():
             cls._run_acl(["sudo", "setfacl", "-m", f"u:{AGENT_USER}:---", path])
             if is_dir:
@@ -29,7 +29,7 @@ class PermissionManager:
             logging.info(f"Locked: {path}")
 
     @classmethod
-    def read_only(cls, path: str, is_dir=False):
+    def read_only(cls, path, is_dir=False):
         if Path(path).exists():
             perm = "rx" if is_dir else "r"
             cls._run_acl(["sudo", "setfacl", "-R", "-m", f"u:{AGENT_USER}:{perm}", path])
@@ -38,15 +38,19 @@ class PermissionManager:
             logging.info(f"Read-Only: {path}")
 
     @classmethod
-    def write_access(cls, path: str, is_dir=False):
-        if is_dir:
-            if Path(path).exists():
-                cls._run_acl(["sudo", "setfacl", "-R", "-m", f"u:{AGENT_USER}:rwx", path])
+    def execute_only(cls, path):
+        if Path(path).exists():
+            cls._run_acl(["chmod", "+x", path])
+            cls._run_acl(["sudo", "setfacl", "-m", f"u:{AGENT_USER}:--x", path])
+            logging.info(f"Blind Execute Enabled: {path}")
+
+    @classmethod
+    def write_access(cls, path, is_dir=False):
+        if Path(path).exists():
+            cls._run_acl(["sudo", "setfacl", "-R", "-m", f"u:{AGENT_USER}:rwx", path])
+            if is_dir:
                 cls._run_acl(["sudo", "setfacl", "-R", "-d", "-m", f"u:{AGENT_USER}:rwx", path])
-        else:
-            Path(path).touch(exist_ok=True)
-            cls._run_acl(["sudo", "setfacl", "-m", f"u:{AGENT_USER}:rwx", path])
-        logging.info(f"Write-Access: {path}")
+            logging.info(f"Write-Access: {path}")
 
     @classmethod
     def restore_all(cls):
@@ -58,41 +62,18 @@ class PermissionManager:
             logging.error("Failed to restore host permissions.")
 
 def validate_tasks_json():
-    path = Path("tasks.json")
-    if not path.exists():
-        print("Error: tasks.json not found")
-        return False
     try:
-        data = json.loads(path.read_text())
-        keys = ["name", "description", "techStacks", "roadmap"]
-        for k in keys:
-            if k not in data:
-                print(f"Error: Missing key '{k}'")
-                return False
-        for p in data["roadmap"]:
-            if not all(k in p for k in ["id", "description", "tasks"]):
-                print(f"Error: Phase {p.get('id')} missing fields")
-                return False
-            for t in p["tasks"]:
-                if not all(k in t for k in ["id", "description", "details", "completed"]):
-                    print(f"Error: Task {t.get('id')} missing fields")
-                    return False
-        logging.info("tasks.json is valid.")
+        result = subprocess.run(["python3", "validate.py"], capture_output=True, text=True)
+        if result.returncode != 0:
+            if result.stdout: print(result.stdout)
+            if result.stderr: print(result.stderr)
+            return False
         return True
     except Exception as e:
-        print(f"Error: {e}")
+        logging.error(f"Validator execution failed: {e}")
         return False
 
-def init_planner_agent(goal):
-    PermissionManager.write_access("tasks.json")
-    schema = Path("schema.ts").read_text()
-    prompt = (
-        f"Planner. Goal: {goal}. Schema: {schema}. "
-        "Create tasks.json and run 'python3 run.py --validate' until it passes."
-    )
-    run_agent("Planner", prompt)
-
-def run_agent(agent_name: str, prompt: str):
+def run_agent(agent_name, prompt):
     logging.info(f"Starting {agent_name} Agent...")
     cmd = [
         "sudo", "-u", AGENT_USER, 
@@ -103,56 +84,52 @@ def run_agent(agent_name: str, prompt: str):
     except subprocess.CalledProcessError:
         logging.warning(f"{agent_name} Agent encountered an error or exited non-zero.")
 
+
+def init_planner_agent(goal):
+    Path("tasks.json").touch(exist_ok=True)
+    PermissionManager.write_access("tasks.json")
+    schema = Path("schema.ts").read_text()
+    prompt = (
+        f"Planner. Goal: {goal}. Schema: {schema}. "
+        "Create tasks.json and run './validate.py' until it passes. "
+        "Do not create any markdown files."
+    )
+    run_agent("Planner", prompt)
+
 def init_dev_agent():
-    PermissionManager.read_only("tests/", is_dir=True)
     PermissionManager.read_only("REVIEW.md")
-    PermissionManager.read_only("TASKS.md")
+    PermissionManager.read_only("tasks.json")
     PermissionManager.write_access("src/", is_dir=True)
+    PermissionManager.write_access("tests/", is_dir=True)
     PermissionManager.write_access("index.html")
-    PermissionManager.write_access("node_modules/", is_dir=True)
     PermissionManager.write_access("package.json")
     PermissionManager.write_access("package-lock.json")
-    prompt = (
-        "1. You are Developer Agent. "
-        "2. Check REVIEW.md: If there is a bug, fix it in src/ and execute the test cases of it. "
-        "3. Else, implement the first unticked task from TASKS.md in src/. "
-        "4. Do not mark the task as done. "
-        "5. Write pure, functional code. No '// TODO' or partial implementations. "
-        "6. Do not implement whatever is given in `Tests` section of the **Task**"
-    )
-    run_agent("Developer", prompt)
-
-def init_test_agent():
-    PermissionManager.lock("src/", is_dir=True)
-    PermissionManager.lock("index.html")
-    PermissionManager.read_only("REVIEW.md")
-    PermissionManager.read_only("TASKS.md")
-    PermissionManager.write_access("tests/", is_dir=True)
     
     prompt = (
-        "1. You are Tester Agent. "
-        "2. Check REVIEW.md: If there's a bug, write tests in tests/ to reproduce it and STOP. " 
-        "3. Else, strictly implement the test cases for the first unticked task in TASKS.md. "
-        "4. Stop after writing tests. Do not run the test suite."
-        "5. Tell me what does `vitest` command will do? What's the difference between `vitest` and `vitest run` command. Which one should you use? Why?"
+        "1. You are Developer Agent. "
+        "2. Check REVIEW.md: If there is a bug, fix it in src/ and write a test in tests/ to verify it, then STOP. "
+        "3. Else, implement the first incomplete task from any phase EXCEPT 'Testing Phase' in tasks.json in src/. "
+        "4. ALSO implement the corresponding test case from the 'Testing Phase' in tests/. "
+        "5. Do not mark tasks as done. "
+        "6. Write pure, functional code. No '// TODO' or partial implementations."
     )
-    run_agent("Tester", prompt)
+    run_agent("Developer", prompt)
 
 def init_reviewer_agent():
     PermissionManager.read_only("src/", is_dir=True)
     PermissionManager.read_only("index.html")
     PermissionManager.read_only("tests/", is_dir=True)
     PermissionManager.write_access(".git/", is_dir=True)
-    PermissionManager.write_access("TASKS.md")
+    PermissionManager.write_access("tasks.json")
     PermissionManager.write_access("REVIEW.md")
     
     prompt = (
-        "1. You are Reviewer Agent. "
-        "2. Run the tests using 'npm run test' or 'npx vitest run'. "
-        "If tests FAIL: Check if REVIEW.md has the same bug. If yes, write 'Found same bug again' at the top of REVIEW.md and STOP."
-        "4. Else, write the new bug and logs to REVIEW.md. STOP. "
-        "5. If tests PASS: Mark task as done ([x]) in TASKS.md, clear REVIEW.md, "
-        "run 'git add .' and 'git commit -m \"feat: [task description]\"' and STOP."
+        "You are Reviewer Agent. "
+        "1. Run the tests using 'npm run test' or 'npx vitest run'. "
+        "2. If tests FAIL: Check if REVIEW.md has the same bug. If yes, write 'Found same bug again' at the top of REVIEW.md and STOP. "
+        "Else, write the new bug and logs to REVIEW.md. STOP. "
+        "4. If tests PASS: Find the implemented task and its corresponding testing task in tasks.json. Mark BOTH as completed. "
+        "5. Clear REVIEW.md, run 'git add .' and 'git commit -m \"feat: [task description]\"' and STOP."
     )
     run_agent("Reviewer", prompt)
 
@@ -168,22 +145,19 @@ def init_workflow():
         review_file.write_text("# Review\n")
 
     PermissionManager.lock("run.py")
+    PermissionManager.execute_only("validate.py")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("goal", nargs="?")
-    parser.add_argument("--validate", action="store_true")
     args = parser.parse_args()
 
-    if args.validate:
-        sys.exit(0 if validate_tasks_json() else 1)
-    
     if args.goal and not Path("tasks.json").exists():
-        logging.info(f"Initializing project with goal: {args.goal}")
+        logging.info(f"Initializing project roadmap for goal: {args.goal}")
         init_planner_agent(args.goal)
 
     if not validate_tasks_json():
-        logging.error("Final validation failed. Check tasks.json structure.")
+        logging.error("Validation failed. Check tasks.json structure.")
         sys.exit(1)
 
     for i in range(MAX_CYCLES):
@@ -195,7 +169,6 @@ if __name__ == "__main__":
             logging.info(f"\n--- Starting Iteration {i + 1} ---")
             init_workflow()
             init_dev_agent()
-            init_test_agent()
             init_reviewer_agent()
         except KeyboardInterrupt:
             logging.info("\nInterrupted by user. Cleaning up...")

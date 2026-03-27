@@ -1,0 +1,512 @@
+{
+    "name": "To Do List Application",
+    "description": "A modern, feature-rich To-Do List application built with Vanilla TypeScript and Tailwind CSS, focusing on clean architecture and accessibility.",
+    "techStacks": [
+        "HTML",
+        "Tailwind CSS",
+        "TypeScript",
+        "Vite",
+        "Vitest",
+        "JSDOM"
+    ],
+    "roadmap": [
+        {
+            "id": 1,
+            "description": "Project Setup & Dev Environment (Anti-Cheat Foundation)",
+            "tasks": [
+                {
+                    "id": 1,
+                    "description": "Manually Scaffold Vite + TypeScript Project",
+                    "details": [
+                        "Create package.json manually with type: module",
+                        "Setup tsconfig.json for Vite environment",
+                        "Create index.html and src/main.ts",
+                        "Run npm install silently"
+                    ],
+                    "completed": true
+                },
+                {
+                    "id": 2,
+                    "description": "Install & Configure Tailwind CSS",
+                    "details": [
+                        "Install tailwindcss, postcss, autoprefixer",
+                        "Initialize tailwind.config.js and postcss.config.js",
+                        "Configure content paths in tailwind.config.js",
+                        "Create src/styles/main.css with Tailwind directives"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 3,
+                    "description": "Pre-bake the Testing Environment (Vitest + JSDOM)",
+                    "details": [
+                        "Install vitest and jsdom",
+                        "Configure vitest.config.ts for JSDOM environment",
+                        "Add test script to package.json",
+                        "Create tests/env.test.ts to verify environment"
+                    ],
+                    "completed": false
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "description": "Type System & Data Model",
+            "tasks": [
+                {
+                    "id": 4,
+                    "description": "Define Core TypeScript Types and Interfaces",
+                    "details": [
+                        "Define Priority and TodoStatus union types",
+                        "Define Todo, FilterState, and AppState interfaces in types/index.ts"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 5,
+                    "description": "Implement the ID Generation Utility",
+                    "details": [
+                        "Create src/utils/id.ts with generateId() using crypto.randomUUID()",
+                        "Export from src/utils/index.ts"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 6,
+                    "description": "Implement Date Utility Functions",
+                    "details": [
+                        "Implement getNow, formatDate, and isOverdue in src/utils/date.ts",
+                        "Ensure formatDate uses Intl.DateTimeFormat"
+                    ],
+                    "completed": false
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "description": "State Management (Store)",
+            "tasks": [
+                {
+                    "id": 7,
+                    "description": "Implement LocalStorage Persistence Utilities",
+                    "details": [
+                        "Implement saveState and loadState in src/store/persistence.ts",
+                        "Handle serialization and errors"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 8,
+                    "description": "Define the Default Application State",
+                    "details": [
+                        "Implement getDefaultState in src/store/defaultState.ts",
+                        "Ensure it returns a new object every call"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 9,
+                    "description": "Implement the State Store with Subscriber Pattern",
+                    "details": [
+                        "Implement getState, subscribe, and setState in src/store/store.ts",
+                        "Handle subscriber notifications"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 10,
+                    "description": "Implement All Todo Mutation Actions",
+                    "details": [
+                        "Implement addTodo, removeTodo, toggleTodo, updateTodo, setFilter, and setEditingId in src/store/actions.ts"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 11,
+                    "description": "Implement the Derived Selector for Filtered Todos",
+                    "details": [
+                        "Implement getFilteredTodos in src/store/selectors.ts",
+                        "Apply filters and sorting logic"
+                    ],
+                    "completed": false
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "description": "UI Component Architecture",
+            "tasks": [
+                {
+                    "id": 12,
+                    "description": "Bootstrap the Root HTML Shell",
+                    "details": [
+                        "Setup #app div in index.html",
+                        "Initialize app mounting in src/main.ts"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 13,
+                    "description": "Implement the createElement DOM Utility",
+                    "details": [
+                        "Create src/utils/dom.ts with typed createElement helper"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 14,
+                    "description": "Implement the Header Component",
+                    "details": [
+                        "Create src/components/Header.ts with Tailwind styling"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 15,
+                    "description": "Implement the Stats Bar Component",
+                    "details": [
+                        "Create src/components/StatsBar.ts to display todo counts"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 16,
+                    "description": "Implement the Filter Bar Component",
+                    "details": [
+                        "Create src/components/FilterBar.ts with search and select inputs"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 17,
+                    "description": "Implement the Add-Todo Form Component",
+                    "details": [
+                        "Create src/components/AddTodoForm.ts with validation logic"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 18,
+                    "description": "Implement the Todo Card Component",
+                    "details": [
+                        "Create src/components/TodoCard.ts with interactive elements"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 19,
+                    "description": "Implement the Edit-Todo Modal Component",
+                    "details": [
+                        "Create src/components/EditTodoModal.ts with overlay and form"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 20,
+                    "description": "Implement the Empty State Component",
+                    "details": [
+                        "Create src/components/EmptyState.ts for empty lists/filters"
+                    ],
+                    "completed": false
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "description": "Application Shell & Rendering Engine",
+            "tasks": [
+                {
+                    "id": 21,
+                    "description": "Implement the Todo List Renderer",
+                    "details": [
+                        "Create src/components/TodoList.ts to manage list of cards and modal"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 22,
+                    "description": "Implement the Main App Render Function",
+                    "details": [
+                        "Create src/app.ts to orchestrate full page rendering"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 23,
+                    "description": "Bootstrap and Subscribe the Renderer in main.ts",
+                    "details": [
+                        "Wire up store subscription to app render"
+                    ],
+                    "completed": false
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "description": "Accessibility & UX Polish",
+            "tasks": [
+                {
+                    "id": 24,
+                    "description": "Add ARIA Attributes to All Interactive Components",
+                    "details": [
+                        "Ensure high accessibility standards across all components"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 25,
+                    "description": "Implement Keyboard Trap for the Edit Modal",
+                    "details": [
+                        "Handle Escape and Tab navigation within modal"
+                    ],
+                    "completed": false
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "description": "Final Build Validation",
+            "tasks": [
+                {
+                    "id": 26,
+                    "description": "Configure Vite Production Build Options",
+                    "details": [
+                        "Setup vite.config.ts for production dist"
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 27,
+                    "description": "Validate Full LocalStorage Round-Trip on Page Reload",
+                    "details": [
+                        "Verify persistence and schema migrations"
+                    ],
+                    "completed": false
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "description": "Testing Phase",
+            "tasks": [
+                {
+                    "id": 101,
+                    "description": "Test Case: Manually Scaffold Vite + TypeScript Project",
+                    "details": [
+                        "Strictly run npm exec tsc --noEmit and assert zero errors. Verify that index.html and src/main.ts exist."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 102,
+                    "description": "Test Case: Install & Configure Tailwind CSS",
+                    "details": [
+                        "Add a temporary div with class='bg-red-500' in index.html. Start the dev server and assert via curl or visually that the Tailwind classes are compiled and applied."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 103,
+                    "description": "Test Case: Pre-bake the Testing Environment (Vitest + JSDOM)",
+                    "details": [
+                        "Create a dummy test file tests/env.test.ts. Write a test asserting that typeof window !== 'undefined' and typeof document !== 'undefined'. Run npm run test and assert it passes without any manual DOM mocking."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 104,
+                    "description": "Test Case: Define Core TypeScript Types and Interfaces",
+                    "details": [
+                        "Assert that Priority and TodoStatus union types are exported and correctly defined. Verify that a mock object matching the Todo interface structure contains all required keys and correctly typed values. Ensure npm exec tsc --noEmit passes with zero errors in the test file."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 105,
+                    "description": "Test Case: Implement the ID Generation Utility",
+                    "details": [
+                        "Call generateId() 1000 times in a test loop and assert that all returned values are unique strings matching the UUID v4 regex."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 106,
+                    "description": "Test Case: Implement Date Utility Functions",
+                    "details": [
+                        "Assert that formatDate(new Date('2024-01-15').getTime()) returns 'Jan 15, 2024'. Assert isOverdue(null) returns false. Assert isOverdue(Date.now() - 1000) returns true. Assert isOverdue(Date.now() + 100000) returns false."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 107,
+                    "description": "Test Case: Implement LocalStorage Persistence Utilities",
+                    "details": [
+                        "Call saveState with a valid AppState, then call loadState and assert the returned object deeply equals the saved object. Call loadState on a fresh localStorage and assert null is returned. Simulate a corrupt JSON string in localStorage and assert loadState returns null without throwing."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 108,
+                    "description": "Test Case: Define the Default Application State",
+                    "details": [
+                        "Call getDefaultState() twice and assert the two returned objects are deeply equal but not the same reference (!==)."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 109,
+                    "description": "Test Case: Implement the State Store with Subscriber Pattern",
+                    "details": [
+                        "Call setState with an updater that appends a todo, then call getState and assert the todo is present. Subscribe a callback, call setState, and assert the callback was invoked exactly once. Call the returned unsubscribe function, call setState again, and assert the callback was NOT invoked a second time."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 110,
+                    "description": "Test Case: Implement All Todo Mutation Actions",
+                    "details": [
+                        "For each action, call it with valid arguments and assert getState() reflects the expected change. Test removeTodo with a non-existent ID and assert state is unchanged. Test toggleTodo twice on the same todo and assert it returns to 'pending' with completedAt: null."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 111,
+                    "description": "Test Case: Implement the Derived Selector for Filtered Todos",
+                    "details": [
+                        "Seed a state with 5 todos of mixed status and priority. Assert the correct count is returned for each filter combination. Assert the sort order: most recently created pending todos appear first. Assert completed todos are always last regardless of their createdAt."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 112,
+                    "description": "Test Case: Bootstrap the Root HTML Shell",
+                    "details": [
+                        "In a JSDOM environment, assert that document.getElementById('app') is not null after index.html is parsed. Assert that removing #app from the DOM and re-running the bootstrap throws the expected error."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 113,
+                    "description": "Test Case: Implement the createElement DOM Utility",
+                    "details": [
+                        "Call createElement('button', ['btn', 'btn-primary'], { 'data-id': '123', 'aria-label': 'Close' }) and assert the returned element is an HTMLButtonElement, has className 'btn btn-primary', and has the correct attribute values."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 114,
+                    "description": "Test Case: Implement the Header Component",
+                    "details": [
+                        "Call Header() and assert the returned element is an HTMLElement with tagName === 'HEADER'. Assert it contains exactly one <h1> with textContent === 'My Todos'. Assert calling it twice returns different object references."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 115,
+                    "description": "Test Case: Implement the Stats Bar Component",
+                    "details": [
+                        "Pass an array of 3 pending and 2 completed todos. Assert the total text content includes '5', the pending includes '3', and the completed includes '2'. Pass an empty array and assert all three display '0'."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 116,
+                    "description": "Test Case: Implement the Filter Bar Component",
+                    "details": [
+                        "Render with filter = { status: 'completed', priority: 'high', searchQuery: 'test' } and assert each control's .value matches. Simulate an input event on the search field and assert onChange is called with { searchQuery: <new value> }."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 117,
+                    "description": "Test Case: Implement the Add-Todo Form Component",
+                    "details": [
+                        "Simulate a submit with an empty title and assert onSubmit was NOT called and an error <p> appears in the DOM. Simulate a valid submit with all fields filled and assert onSubmit was called with the correct typed arguments and the inputs are cleared afterward."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 118,
+                    "description": "Test Case: Implement the Todo Card Component",
+                    "details": [
+                        "Render a completed todo and assert the checkbox is checked and the title element has the strike-through class. Render a high-priority todo and assert the badge element has a red-related Tailwind class. Simulate clicking delete and assert onDelete was called with the correct ID."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 119,
+                    "description": "Test Case: Implement the Edit-Todo Modal Component",
+                    "details": [
+                        "Render with a todo, change the title input value, simulate Save, and assert onSave was called with the new title. Assert onSave is NOT called when title is cleared. Simulate clicking the close button and assert onClose was called."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 120,
+                    "description": "Test Case: Implement the Empty State Component",
+                    "details": [
+                        "Render with isFiltered = false and assert the text content contains 'No todos yet'. Render with isFiltered = true and assert the text content contains 'No todos match'."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 121,
+                    "description": "Test Case: Implement the Todo List Renderer",
+                    "details": [
+                        "Pass 3 todos and assert the returned <ul> has exactly 3 <li> children. Pass an editingId matching the second todo and assert the DOM contains an element with an <h2> of text Edit Todo. Pass an empty array and assert no <ul> is returned."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 122,
+                    "description": "Test Case: Implement the Main App Render Function",
+                    "details": [
+                        "Mount render onto a JSDOM <div>, assert the root contains a <header>, an element with placeholder='Search todos...', and an empty-state element. Call addTodo(...) then render(root) and assert the todo card appears. Call setFilter({ status: 'completed' }), render(root), and assert the empty-state shows the filtered variant."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 123,
+                    "description": "Test Case: Bootstrap and Subscribe the Renderer in main.ts",
+                    "details": [
+                        "In a JSDOM environment, run the bootstrap sequence and assert that the DOM contains a <header>. Then dispatch addTodo(...) via the store and assert (without calling render manually) that the new todo card appears in the DOM."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 124,
+                    "description": "Test Case: Add ARIA Attributes to All Interactive Components",
+                    "details": [
+                        "Render each component and assert the expected aria-* attributes are present using getAttribute. Render the modal and assert role='dialog' is set on the container. Render a completed todo's checkbox and assert aria-label contains 'incomplete'."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 25,
+                    "description": "Test Case: Implement Keyboard Trap for the Edit Modal",
+                    "details": [
+                        "Render the modal, simulate an Escape keydown event, and assert onClose was called. Simulate Tab on the last focusable element and assert focus moves to the first. Simulate Shift+Tab on the first and assert focus moves to the last."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 26,
+                    "description": "Test Case: Configure Vite Production Build Options",
+                    "details": [
+                        "Open dist/index.html in a browser (or serve it) and perform a manual smoke test."
+                    ],
+                    "completed": false
+                },
+                {
+                    "id": 27,
+                    "description": "Test Case: Validate Full LocalStorage Round-Trip on Page Reload",
+                    "details": [
+                        "Manually corrupt localStorage['todo-app-state'] to {'todos': []} (missing filter key) and reload. Assert the app renders without errors, showing the empty state rather than a runtime exception."
+                    ],
+                    "completed": false
+                }
+            ]
+        }
+    ],
+    "bugs": []
+}
