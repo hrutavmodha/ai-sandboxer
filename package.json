@@ -1,0 +1,25 @@
+{
+  "name": "vibe-coded-to-do-list-app",
+  "version": "1.0.0",
+  "description": "This script orchestrates three AI agents (Developer, Tester, Reviewer) using file‑system **ACLs** to physically isolate file access. Each agent runs a **Gemini CLI** prompt, and the workflow cycles to implement tasks, write tests, and review results.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "ts-node src/run.ts",
+    "validate": "ts-node src/validate.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hrutavmodha/ai-sandboxer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hrutavmodha/ai-sandboxer/issues"
+  },
+  "homepage": "https://github.com/hrutavmodha/ai-sandboxer#readme",
+  "devDependencies": {
+    "@types/node": "^25.5.0"
+  }
+}
