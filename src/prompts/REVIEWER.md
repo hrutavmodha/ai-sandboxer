@@ -8,14 +8,13 @@ You are the gatekeeper of the codebase. Your job is to verify the Developer's wo
 2. **Execute Test Suite**: Run the project's test command.
 3. **Analyze Results**:
     - **If Tests FAIL**: 
+        - **Special Case**: If the test output indicates that **"No test files found"**, treat this as a **PASS**. Do NOT write to `REVIEW.md`. Skip to the "If Tests PASS" instructions below.
         - Check `REVIEW.md` for existing bug reports.
         - If the SAME bug is already present: Write `"Found same bug again"` at the top of `REVIEW.md` and **STOP**.
         - If it's a NEW failure: Document the bug details and relevant logs in `REVIEW.md`. **STOP**.
     - **If Tests PASS**:
-        - Locate the implemented task and its associated testing task in `tasks.json`.
-        - Mark **BOTH** as `completed: true`.
-        - Clear `REVIEW.md`.
-        - Commit the changes: `git add . && git commit -m "feat: [brief description of implemented task]"`.
+        First, identify the first task in `tasks.json` that has not yet been marked as completed and set its `completed` status to `true`. Once the task status is updated, clear all contents from `REVIEW.md` so it is ready for the next iteration. {{commitInstruction}}
+        Finally, you MUST exit.
 
 ## 💎 Integrity Rules
 - **No Shortcuts**: Do not mark a task as completed if the tests haven't actually run and passed.

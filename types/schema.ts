@@ -2,13 +2,15 @@ export interface Task {
     id: number,
     description: string,
     details: Array<string>,
+    tests: Array<string>,
     completed: boolean
 }
 
 export interface Phase {
     id: number,
     description: string,
-    tasks: Array<Task>
+    tasks: Array<Task>,
+    tests: Array<string>
 }
 
 export interface Project {

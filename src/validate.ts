@@ -80,7 +80,7 @@ function validateTask(task: unknown, taskIndex: number, phaseIndex: number): Res
     return { ok: false, error: new ValidationError(`Task ${taskIndex} in Phase ${phaseIndex} must be an object.`) };
   }
 
-  const requiredFields = ['id', 'description', 'details', 'completed'];
+  const requiredFields = ['id', 'description', 'details', 'tests', 'completed'];
   for (const field of requiredFields) {
     if (!(field in task)) {
       return { ok: false, error: new ValidationError(`Task ${taskIndex} in Phase ${phaseIndex} missing field: '${field}'`) };
@@ -95,6 +95,9 @@ function validateTask(task: unknown, taskIndex: number, phaseIndex: number): Res
   }
   if (!Array.isArray(task.details)) {
     return { ok: false, error: new ValidationError(`Task ${taskIndex} in Phase ${phaseIndex} 'details' must be an array.`) };
+  }
+  if (!Array.isArray(task.tests)) {
+    return { ok: false, error: new ValidationError(`Task ${taskIndex} in Phase ${phaseIndex} 'tests' must be an array.`) };
   }
   if (typeof task.completed !== 'boolean') {
     return { ok: false, error: new ValidationError(`Task ${taskIndex} in Phase ${phaseIndex} 'completed' must be a boolean.`) };
@@ -115,7 +118,7 @@ function validatePhase(phase: unknown, phaseIndex: number): Result<void, Validat
     return { ok: false, error: new ValidationError(`Phase ${phaseIndex} must be an object.`) };
   }
 
-  const requiredPhaseFields = ['id', 'description', 'tasks'];
+  const requiredPhaseFields = ['id', 'description', 'tasks', 'tests'];
   for (const field of requiredPhaseFields) {
     if (!(field in phase)) {
       return { ok: false, error: new ValidationError(`Phase ${phaseIndex} missing field: '${field}'`) };
@@ -124,6 +127,10 @@ function validatePhase(phase: unknown, phaseIndex: number): Result<void, Validat
 
   if (!Array.isArray(phase.tasks)) {
     return { ok: false, error: new ValidationError(`Phase ${phaseIndex} 'tasks' must be an array.`) };
+  }
+
+  if (!Array.isArray(phase.tests)) {
+    return { ok: false, error: new ValidationError(`Phase ${phaseIndex} 'tests' must be an array.`) };
   }
 
   for (let taskIndex = 0; taskIndex < phase.tasks.length; taskIndex++) {

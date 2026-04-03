@@ -163,6 +163,27 @@ function spawnDeveloperAgent(config: Config): void {
 }
 
 /**
+ * Initializes the Tester Agent to write test cases.
+ *
+ * @param config - The loaded project configuration.
+ * @param tests - The list of test descriptions to implement.
+ */
+function spawnTesterAgent(config: Config, tests: string[]): void {
+  const appTestsDirectory = path.join(appDirectory, config.project.dirs.tests);
+  grantWriteAccess(appTestsDirectory, true, agentUsername);
+
+  const prompt = loadPrompt('TESTER.md', {
+    testsDir: config.project.dirs.tests,
+    testSpecs: tests.map(t => `- ${t}`).join('\n')
+  });
+
+  const result = runAgentProcess('Tester', prompt);
+  if (!result.ok) {
+    console.error(`[WARN] Tester agent failed: ${result.error.message}`);
+  }
+}
+
+/**
  * Initializes the Reviewer Agent to validate and commit changes.
  *
  * @param config - The loaded project configuration.
@@ -177,7 +198,13 @@ function spawnReviewerAgent(config: Config): void {
   grantWriteAccess(tasksFilePath, false, agentUsername);
   grantWriteAccess(reviewFilePath, false, agentUsername);
 
-  const prompt = loadPrompt('REVIEWER.md', {});
+  const commitInstruction = config.agents?.reviewer?.autoCommit 
+    ? "Since auto-commit is enabled, you must now stage all your changes using 'git add .' and create a commit with a message like 'feat: [task description]' before you finish."
+    : "Auto-commit is disabled for this project, so you must NOT make any git commits. Just update the task status and stop.";
+
+  const prompt = loadPrompt('REVIEWER.md', {
+    commitInstruction
+  });
 
   const result = runAgentProcess('Reviewer', prompt);
   if (!result.ok) {
@@ -245,7 +272,22 @@ async function executeWorkflow(): Promise<void> {
 
     console.log(`\n--- Starting Iteration ${cycleIndex + 1} ---`);
     secureWorkspace();
+    
+    // Developer Agent always runs
     spawnDeveloperAgent(config);
+
+    // Conditional Tester Agent run
+    if (fs.existsSync(tasksFilePath)) {
+      const tasksData = JSON.parse(fs.readFileSync(tasksFilePath, 'utf8'));
+      const currentPhase = tasksData.roadmap.find((p: any) => p.tasks.some((t: any) => !t.completed));
+      const currentTask = currentPhase?.tasks.find((t: any) => !t.completed);
+
+      if (currentTask && Array.isArray(currentTask.tests) && currentTask.tests.length > 0) {
+        console.log(`[INFO] Tests detected for task: ${currentTask.description}. Spawning Tester Agent...`);
+        spawnTesterAgent(config, currentTask.tests);
+      }
+    }
+
     spawnReviewerAgent(config);
     
     restoreHostAccess(rootDirectory, hostUsername);

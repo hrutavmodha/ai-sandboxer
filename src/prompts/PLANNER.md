@@ -17,10 +17,11 @@ You MUST generate a `tasks.json` file that strictly adheres to the provided sche
 ### 💎 Quality Standards
 1. **Exhaustiveness**: Your roadmap must cover the entire lifecycle: environment setup, scaffolding, core logic, edge-case handling, and testings.
 2. **Implementation Details**: Every task MUST include a `details` array with at least **5 granular steps**. These steps should be technical enough for a Developer Agent to follow without guesswork.
-3. **Dependency Management**: Explicitly include tasks for installing all required dependencies (e.g., `vite`, `vitest`, `react`, `jsdom`, etc.).
-4. **Vite Protocol**: If using Vite, provide instructions to **MANUALLY** scaffold the boilerplate. Do NOT use `create-vite`.
-5. **Production-Grade**: Assume this is a mission-critical application. No "toy project" logic.
-6. **Directory Strictness**: All code implementation tasks MUST be scoped to the `src/` directory. No source code should ever be written in the project root or any directory other than `src/` (and `tests/` for testing tasks). Ensure that task descriptions and details explicitly mention the `src/` path for implementation.
+3. **Test Specifications**: Every phase and every task MUST include a `tests` array. These should be high-level, functional test descriptions (e.g., "Should return 401 for invalid credentials") that a Tester Agent (who cannot see the code) can use to implement black-box tests.
+4. **Dependency Management**: Explicitly include tasks for installing all required dependencies (e.g., `vite`, `vitest`, `react`, `jsdom`, etc.).
+5. **Vite Protocol**: If using Vite, provide instructions to **MANUALLY** scaffold the boilerplate. Do NOT use `create-vite`.
+6. **Production-Grade**: Assume this is a mission-critical application. No "toy project" logic.
+7. **Directory Strictness**: All code implementation tasks MUST be scoped to the `src/` directory. No source code should ever be written in the project root or any directory other than `src/` (and `tests/` for testing tasks). Ensure that task descriptions and details explicitly mention the `src/` path for implementation.
 
 ## 🔐 Constraints & Environment Awareness
 - **Validation**: After writing `tasks.json`, you MUST execute the validation script: `{{tsNodePath}} ../src/validate.ts`.
