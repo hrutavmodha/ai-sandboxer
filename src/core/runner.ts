@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { appDirectory } from './paths.ts';
-import { type Result } from '../acl.ts';
+import { type Result } from '../../types/result.ts';
 
 /**
  * Resolves the absolute path of an executable using the 'which' command.

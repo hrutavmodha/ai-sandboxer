@@ -1,12 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
-
-/**
- * Represents a successful or failed operation.
- */
-export type Result<T, E = Error> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+import { type Result } from '../types/result.ts';
 
 /**
  * Domain error for Access Control List failures.

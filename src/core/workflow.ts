@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { type Config } from '../config.ts';
+import { type Config } from '../../types/config.ts';
 import { FeatureNotImplementedError } from '../utils/errors.ts';
 import { 
   rootDirectory, 

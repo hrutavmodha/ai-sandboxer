@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import { type Config } from '../../config.ts';
+import { type Config } from '../../../types/config.ts';
 import { appDirectory } from '../../core/paths.ts';
 import { grantWriteAccess } from '../../acl.ts';
 import { loadPrompt } from '../../core/prompt-loader.ts';

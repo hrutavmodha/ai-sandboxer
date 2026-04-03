@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import type { Config } from './config.ts';
-import { type Result } from './acl.ts';
+import { type Config } from '../types/config.ts';
+import { type Result } from '../types/result.ts';
 import { configFilePath } from './core/paths.ts';
 import { checkSystemSupport, runWorkflow } from './core/workflow.ts';
 
