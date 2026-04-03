@@ -7,7 +7,7 @@ export interface Config {
     /** Name of the application being built */
     name: string;
     /** The technology stack (e.g., "Python/FastAPI", "Rust/Axum") */
-    stack: string;
+    techStack: Array<string>;
     /** Directory structure for the generated application */
     dirs: {
       /** Where source code lives relative to the app root */

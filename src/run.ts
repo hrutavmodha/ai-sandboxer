@@ -15,14 +15,35 @@ import {
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = path.dirname(currentFilePath);
 const rootDirectory = path.resolve(currentDirPath, '..');
+
+/**
+ * Recursively searches for 'vibe.config.ts' starting from the current directory.
+ * Also checks the 'app' subdirectory as a default.
+ */
+function findVibeConfig(startDir: string): string | null {
+  let current = startDir;
+  while (true) {
+    const configPath = path.join(current, 'vibe.config.ts');
+    if (fs.existsSync(configPath)) return configPath;
+    
+    const appConfigPath = path.join(current, 'app', 'vibe.config.ts');
+    if (fs.existsSync(appConfigPath)) return appConfigPath;
+
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+  return null;
+}
+
+const configFilePath = findVibeConfig(process.cwd()) || path.join(rootDirectory, 'app', 'vibe.config.ts');
+const appDirectory = path.dirname(configFilePath);
 const srcDirectory = path.join(rootDirectory, 'src');
 const typesDirectory = path.join(rootDirectory, 'types');
-const appDirectory = path.join(rootDirectory, 'app');
 const tasksFilePath = path.join(appDirectory, 'tasks.json');
 const reviewFilePath = path.join(appDirectory, 'REVIEW.md');
 const validateScriptPath = path.join(srcDirectory, 'validate.ts');
 const schemaFilePath = path.join(typesDirectory, 'schema.ts');
-const configFilePath = path.join(rootDirectory, 'vibe.config.ts');
 
 const agentUsername = 'gemini-agent';
 const hostUsername = 'hrutav-modha';
@@ -30,6 +51,28 @@ const geminiCliPath = '/usr/local/nodejs/bin/gemini';
 const nodePath = '/usr/local/nodejs/bin/node';
 const tsNodePath = '/usr/local/nodejs/bin/ts-node';
 const maximumCycles = 1;
+
+/**
+ * Loads a prompt template from the prompts directory and replaces variables.
+ *
+ * @param templateName - The name of the markdown file (e.g., 'PLANNER.md').
+ * @param variables - A record of key-value pairs to substitute.
+ * @returns The final prompt string.
+ */
+function loadPrompt(templateName: string, variables: Record<string, string>): string {
+  const templatePath = path.join(srcDirectory, 'prompts', templateName);
+  if (!fs.existsSync(templatePath)) {
+    throw new Error(`Prompt template not found at ${templatePath}`);
+  }
+
+  let content = fs.readFileSync(templatePath, 'utf8');
+  for (const [key, value] of Object.entries(variables)) {
+    const placeholder = new RegExp(`{{${key}}}`, 'g');
+    content = content.replace(placeholder, value);
+  }
+
+  return content;
+}
 
 /**
  * Loads the Vibe configuration from the workspace root.
@@ -87,21 +130,12 @@ function spawnPlannerAgent(goal: string, config: Config): void {
   const customInstructions = config.agents?.planner?.customInstructions 
     ?? 'If your tasks include Vite, include instructions to MANUALLY scaffold the vite boilerplate, not using create-vite.'
 
-  const prompt = [
-    `1. You are Planner Agent.`,
-    `2. YOUR goal is '${goal}'.`,
-    `3. Schema: ${schemaContent}.`,
-    `4. Create tasks.json which should contain the exhaustive, minutely implementable list of tasks.`,
-    `5. Make sure that the tasks file should follow the provided schema.`,
-    `6. ${customInstructions}`,
-    `7. Your tasks object must include the minimum of 5 steps of implementation details in \`details\` object.`,
-    `8. Run ${tsNodePath} ../src/validate.ts after you create tasks.json file accurately.`,
-    `9. You have not read, nor write accesss to the validation script, you can only execute it after writing tasks.json. So, do not waste time in hallucinating the write or read access to the validation script. None of your tool will spot it because your tools are bound to OS, and this is OS-level lock.`,
-    `10. Prioritize correctness over security, and security over efficiency. If correctness is achieved, try to achieve security. If correctness and security are achieved, try to achieve correctness.`,
-    `11. While creating the tasks file, always assume that user is asking for production-grade code, not any side or toy project.`,
-    `12. FUCK YOU thousand times if you spitted the contents of the tasks.json which you will write, in front of the terminal screen of the users. FUCK YOU if you used any sub-agent.`,
-    `13. While framing the tasks.json file, ensure that you include the instructions to install all kinds of the dependencies in a phase (e.g., vitest for testing, react and vite for development work, jsdom for mocking DOM, etc..)`
-  ].join(' ');
+  const prompt = loadPrompt('PLANNER.md', {
+    goal,
+    schema: schemaContent,
+    tsNodePath,
+    customInstructions
+  });
 
   const result = runAgentProcess('Planner', prompt);
   if (!result.ok) {
@@ -117,15 +151,10 @@ function spawnPlannerAgent(goal: string, config: Config): void {
 function spawnDeveloperAgent(config: Config): void {
   grantWriteAccess(appDirectory, true, agentUsername);
   
-  const prompt = [
-    `1. You are Developer Agent.`,
-    `2. Check REVIEW.md: If there is a bug, fix it in ${config.project.dirs.src}/ and write a test in ${config.project.dirs.tests}/ to verify it, then STOP.`,
-    `3. Else, implement the first incomplete task from in tasks.json in ${config.project.dirs.src}/.`,
-    `4. If the phase is Testing Phase, write test cases in ${config.project.dirs.tests}/.`,
-    `5. Do not mark tasks as done.`,
-    `6. Write pure, functional code. No '// TODO' or partial implementations.`,
-    `7. Fuck you if you don't stops after implementing the feature or fixing the one bug`
-  ].join(' ');
+  const prompt = loadPrompt('DEVELOPER.md', {
+    srcDir: config.project.dirs.src,
+    testsDir: config.project.dirs.tests
+  });
 
   const result = runAgentProcess('Developer', prompt);
   if (!result.ok) {
@@ -148,14 +177,7 @@ function spawnReviewerAgent(config: Config): void {
   grantWriteAccess(tasksFilePath, false, agentUsername);
   grantWriteAccess(reviewFilePath, false, agentUsername);
 
-  const prompt = [
-    `1. You are Reviewer Agent.`,
-    `2. Ensure that the testing dependencies are installed. `,
-    `3. If tests FAIL: Check if REVIEW.md has the same bug. If yes, write 'Found same bug again' at the top of REVIEW.md and STOP.`,
-    `4. Else, write the new bug and logs to REVIEW.md. STOP.`,
-    `5. If tests PASS: Find the implemented task and its corresponding testing task in tasks.json. Mark BOTH as completed.`,
-    `6. Clear REVIEW.md, run 'git add .' and 'git commit -m "feat: [task description]"' and STOP.`
-  ].join(' ');
+  const prompt = loadPrompt('REVIEWER.md', {});
 
   const result = runAgentProcess('Reviewer', prompt);
   if (!result.ok) {
@@ -210,6 +232,7 @@ async function executeWorkflow(): Promise<void> {
   process.on('SIGINT', () => {
     console.log('\n[INFO] Interrupted by user. Cleaning up...');
     restoreHostAccess(rootDirectory, hostUsername);
+    if (appDirectory !== rootDirectory) restoreHostAccess(appDirectory, hostUsername);
     process.exit(0);
   });
 
@@ -225,10 +248,8 @@ async function executeWorkflow(): Promise<void> {
     spawnDeveloperAgent(config);
     spawnReviewerAgent(config);
     
-    const restoreResult = restoreHostAccess(rootDirectory, hostUsername);
-    if (!restoreResult.ok) {
-      console.error(`[ERROR] Failed to restore permissions: ${restoreResult.error.message}`);
-    }
+    restoreHostAccess(rootDirectory, hostUsername);
+    if (appDirectory !== rootDirectory) restoreHostAccess(appDirectory, hostUsername);
   }
 
   console.log('\n[INFO] Workflow completely executed.');
