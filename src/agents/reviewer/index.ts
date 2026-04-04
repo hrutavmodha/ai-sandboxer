@@ -12,7 +12,7 @@ import { runAgentProcess } from '../../core/runner.ts';
 
 const defaultGeminiPath = 'gemini';
 
-export function spawnReviewerAgent(config: Config): void {
+export async function spawnReviewerAgent(config: Config): Promise<void> {
   const agentUsername = config.system.agentUserName || 'nobody';
   const command = config.agents?.reviewer?.command || defaultGeminiPath;
 
@@ -37,7 +37,7 @@ export function spawnReviewerAgent(config: Config): void {
     commitInstruction
   });
 
-  const result = runAgentProcess('Reviewer', prompt, command, agentUsername);
+  const result = await runAgentProcess('Reviewer', prompt, command, agentUsername);
   if (!result.ok) {
     console.error(`[WARN] Reviewer agent failed: ${result.error.message}`);
   }

@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { type Config } from '../../types/config.ts';
 import { FeatureNotImplementedError } from '../utils/errors.ts';
+import { tsNodePath } from './paths.ts';
 import { 
   rootDirectory, 
   srcDirectory, 
@@ -46,8 +47,15 @@ export function secureWorkspace(config: Config): void {
 
   lockPath(srcDirectory, true, agentUsername);
   lockPath(typesDirectory, true, agentUsername);
+  
+  // Grant execute to binaries
   grantExecuteAccess(nodePath, agentUsername);
-  grantExecuteAccess(validateScriptPath, agentUsername);
+  grantExecuteAccess(tsNodePath, agentUsername);
+  
+  // Grant traversal (x) to src/ and read (r) to validate.ts
+  // We use sudo directly to be precise
+  spawnSync('sudo', ['setfacl', '-m', `u:${agentUsername}:x`, srcDirectory], { cwd: rootDirectory });
+  spawnSync('sudo', ['setfacl', '-m', `u:${agentUsername}:r`, validateScriptPath], { cwd: rootDirectory });
 }
 
 export async function runWorkflow(config: Config, targetGoal: string): Promise<void> {
@@ -59,7 +67,7 @@ export async function runWorkflow(config: Config, targetGoal: string): Promise<v
 
   if (targetGoal && !fs.existsSync(tasksFilePath)) {
     console.log(`[INFO] Initializing project roadmap for goal: ${targetGoal}`);
-    spawnPlannerAgent(targetGoal, config);
+    await spawnPlannerAgent(targetGoal, config);
   }
 
   process.on('SIGINT', () => {
@@ -78,7 +86,7 @@ export async function runWorkflow(config: Config, targetGoal: string): Promise<v
 
     console.log(`\n--- Starting Iteration ${cycleIndex + 1} ---`);
     secureWorkspace(config);
-    spawnDeveloperAgent(config);
+    await spawnDeveloperAgent(config);
 
     if (fs.existsSync(tasksFilePath)) {
       const tasksData = JSON.parse(fs.readFileSync(tasksFilePath, 'utf8'));
@@ -87,10 +95,10 @@ export async function runWorkflow(config: Config, targetGoal: string): Promise<v
 
       if (currentTask && Array.isArray(currentTask.tests) && currentTask.tests.length > 0) {
         console.log(`[INFO] Tests detected for task: ${currentTask.description}. Spawning Tester Agent...`);
-        spawnTesterAgent(config, currentTask.tests);
+        await spawnTesterAgent(config, currentTask.tests);
       }
     }
-    spawnReviewerAgent(config);
+    await spawnReviewerAgent(config);
     restoreHostAccess(rootDirectory, hostUsername);
     if (appDirectory !== rootDirectory) restoreHostAccess(appDirectory, hostUsername);
   }

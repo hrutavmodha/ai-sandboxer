@@ -35,3 +35,4 @@ export const validateScriptPath = path.join(srcDirectory, 'validate.ts');
 export const schemaFilePath = path.join(typesDirectory, 'schema.ts');
 
 export const nodePath = process.execPath;
+export const tsNodePath = '/usr/local/nodejs/bin/ts-node';

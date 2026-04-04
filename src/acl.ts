@@ -100,7 +100,7 @@ export function grantExecuteAccess(targetPath: string, agentUser: string): Resul
   const chmodResult = executeCommand('chmod', ['+x', targetPath]);
   if (!chmodResult.ok) return chmodResult;
 
-  return executeCommand('sudo', ['setfacl', '-m', `u:${agentUser}:r-x`, targetPath]);
+  return executeCommand('sudo', ['setfacl', '-L', '-m', `u:${agentUser}:r-x`, targetPath]);
 }
 
 /**

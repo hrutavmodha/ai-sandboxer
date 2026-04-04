@@ -6,7 +6,7 @@ import { runAgentProcess } from '../../core/runner.ts';
 
 const defaultGeminiPath = 'gemini';
 
-export function spawnDeveloperAgent(config: Config): void {
+export async function spawnDeveloperAgent(config: Config): Promise<void> {
   const agentUsername = config.system.agentUserName || 'nobody';
   const command = config.agents?.developer?.command || defaultGeminiPath;
 
@@ -17,7 +17,7 @@ export function spawnDeveloperAgent(config: Config): void {
     testsDir: config.project.dirs.tests
   });
 
-  const result = runAgentProcess('Developer', prompt, command, agentUsername);
+  const result = await runAgentProcess('Developer', prompt, command, agentUsername);
   if (!result.ok) {
     console.error(`[WARN] Developer agent failed: ${result.error.message}`);
   }
