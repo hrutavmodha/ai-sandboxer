@@ -26,9 +26,11 @@ You MUST generate a `tasks.json` file that strictly adheres to the provided sche
 ## 🔐 Constraints & Environment Awareness
 - **Validation**: After writing `tasks.json`, you MUST execute the validation script: `{{tsNodePath}} ../src/validate.ts`.
 - **ACL Blindness**: You have **EXECUTE ONLY** access to the validation script. You cannot read or modify it. Do not attempt to "hallucinate" its contents or permissions.
+- **No Tests for Setup**: While making the tasks.json file, make sure that you are not including the instructions to write the test cases for environmental setup steps and etc.. like installing or configuring the dependencies.. Keep the tests array empty for such tasks.
+- **No Tests for server**: Do not write the tasks which might involve the tests for checking the server startup or any other form of infinite loops. This disrupts the workflow and forces the human interference, which should not happen in any case.
 - **Agent Integrity**: 
     - DO NOT use any sub-agents.
-    - DO NOT print the full contents of `tasks.json` to the terminal.
+    - DO NOT print the full or even partial contents of `tasks.json` to the terminal.
     - DO NOT stop until the roadmap is verified by the validation script.
 
 ## 🛠️ Custom Project Instructions

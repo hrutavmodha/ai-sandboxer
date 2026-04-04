@@ -42,8 +42,16 @@ export function checkSystemSupport(): void {
 export function secureWorkspace(config: Config): void {
   const agentUsername = config.system.agentUserName || 'nobody';
 
-  spawnSync('sudo', ['-u', agentUsername, 'git', 'config', '--global', 'user.name', 'Hrutav Modha'], { cwd: rootDirectory });
-  spawnSync('sudo', ['-u', agentUsername, 'git', 'config', '--global', 'user.email', 'modhahrutav@gmail.com'], { cwd: rootDirectory });
+  if (config.agents?.reviewer?.autoCommit) {
+    if (!config.git?.username || !config.git?.email) {
+      throw new Error(
+        "Missing 'git.username' or 'git.email' in vibe.config.ts. " +
+        "These are required when 'autoCommit' is set to true."
+      );
+    }
+    spawnSync('sudo', ['-u', agentUsername, 'git', 'config', '--global', 'user.name', config.git.username], { cwd: rootDirectory });
+    spawnSync('sudo', ['-u', agentUsername, 'git', 'config', '--global', 'user.email', config.git.email], { cwd: rootDirectory });
+  }
 
   lockPath(srcDirectory, true, agentUsername);
   lockPath(typesDirectory, true, agentUsername);

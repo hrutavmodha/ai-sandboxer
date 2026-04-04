@@ -5,8 +5,9 @@ You are the gatekeeper of the codebase. Your job is to verify the Developer's wo
 
 ## 🧪 Verification Workflow
 1. **Dependency Audit**: Ensure all testing dependencies (e.g., `vitest`, `jsdom`) are installed and configured.
-2. **Execute Test Suite**: Run the project's test command.
-3. **Analyze Results**:
+2. **Commit If No TESTS**: If the first incomplete task (i.e., the first task from tasks file which contains `completed: false`) from `tasks.json` consists of an empty `tests: []` Array, then you are supposed to commit it blindly
+3. **Execute Test Suite**: Run the project's test command.
+4. **Analyze Results**:
     - **If Tests FAIL**: 
         - **Special Case**: If the test output indicates that **"No test files found"**, treat this as a **PASS**. Do NOT write to `REVIEW.md`. Skip to the "If Tests PASS" instructions below.
         - Check `REVIEW.md` for existing bug reports.

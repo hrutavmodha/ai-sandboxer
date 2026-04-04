@@ -32,6 +32,13 @@ export interface Config {
       lint?: string;
     };
   };
+  /** Git configuration for automated commits */
+  git?: {
+    /** Git username for auto-commits (required if autoCommit is true) */
+    username: string;
+    /** Git email for auto-commits (required if autoCommit is true) */
+    email: string;
+  };
   /** Configuration for individual AI agents */
   agents?: {
     planner?: {

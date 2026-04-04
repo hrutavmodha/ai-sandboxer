@@ -16,7 +16,7 @@ async function loadWorkspaceConfig(): Promise<Result<Config, Error>> {
     return { ok: false, error: new Error(`Error loading configuration: ${error}`) };
   }
 }
-
+ 
 async function main(): Promise<void> {
   checkSystemSupport();
 
