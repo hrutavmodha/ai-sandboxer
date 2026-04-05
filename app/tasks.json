@@ -1,270 +1,248 @@
 {
-  "name": "Vibe-Coded To-Do List",
-  "description": "A production-grade React/TypeScript to-do application with persistence, filtering, and accessibility.",
+  "name": "Production-Grade To-Do List Application",
+  "description": "A high-performance, accessible, and feature-rich to-do list application built with a modern stack including React, TypeScript, and Express. Includes full CRUD capabilities, persistence, and a polished UI.",
   "techStacks": [
-    "Node.js",
-    "TypeScript",
     "React",
+    "TypeScript",
     "Vite",
+    "Express",
     "Vitest",
-    "Testing Library"
+    "Vanilla CSS",
+    "Zod"
   ],
   "roadmap": [
     {
       "id": 1,
-      "description": "Environment Setup & Scaffolding",
+      "description": "Project Initialization and Environment Setup",
       "tasks": [
         {
           "id": 1,
-          "description": "Project Initialization & Dependency Installation",
+          "description": "Configure Dependencies and Environment",
           "details": [
-            "Initialize npm project with defaults.",
-            "Install React and React-DOM as production dependencies.",
-            "Install TypeScript, Vite, and @vitejs/plugin-react as dev dependencies.",
-            "Install Vitest, jsdom, and @testing-library/react as dev dependencies for testing.",
-            "Install @types/react and @types/react-dom for TypeScript support."
+            "Initialize npm project with 'npm init -y'",
+            "Install core frontend dependencies: react, react-dom",
+            "Install backend dependencies: express, cors, zod, dotenv",
+            "Install dev tools: vite, typescript, vitest, jsdom, @types/react, @types/react-dom, @types/express",
+            "Create .env file for environment variables like PORT and API_URL"
           ],
           "tests": [],
           "completed": true
         },
         {
           "id": 2,
-          "description": "TypeScript & Vite Configuration",
+          "description": "Manual Vite and TypeScript Configuration",
           "details": [
-            "Create tsconfig.json with modern React and TypeScript settings.",
-            "Create tsconfig.node.json for Vite configuration file.",
-            "Create vite.config.ts in the root directory.",
-            "Configure Vite to use the React plugin and set up Vitest with 'jsdom' environment.",
-            "Ensure the build script in package.json is correctly configured for production."
-          ],
-          "tests": [],
-          "completed": false
-        },
-        {
-          "id": 3,
-          "description": "Manual Scaffolding & Entry Point",
-          "details": [
-            "Create index.html in the project root with a root div and script tag pointing to src/main.tsx.",
-            "Create src/main.tsx to bootstrap the React application into the root element.",
-            "Create src/App.tsx as the main application container with a basic functional component.",
-            "Create src/App.css for global application styling.",
-            "Verify the application compiles and renders a basic title in the browser."
-          ],
-          "tests": [
-            "Should render 'To-Do List' title in the document",
-            "Should mount the React application without crashing",
-            "Should have a root element with id 'root' in index.html"
-          ],
-          "completed": false
-        },
-        {
-          "id": 4,
-          "description": "Test Environment Setup",
-          "details": [
-            "Create tests/setup.ts to configure @testing-library/jest-dom matchers.",
-            "Update vite.config.ts to include the setup file in the test configuration.",
-            "Create a dummy test file tests/smoke.test.ts to verify the test runner works.",
-            "Configure the 'test' script in package.json to run 'vitest run'.",
-            "Ensure 'src/' and 'tests/' directories are correctly mapped in the project structure."
+            "Create a root tsconfig.json with support for React and Node",
+            "Create vite.config.ts for frontend bundling and proxying API requests",
+            "Scaffold src/client and src/server directory structure",
+            "Create index.html in the root with a mount point for the React app",
+            "Set up Vitest configuration for unit and integration testing"
           ],
           "tests": [],
           "completed": false
         }
       ],
-      "tests": [
-        "Vitest should successfully run and pass a basic smoke test",
-        "The application should render a placeholder title on the screen"
-      ]
+      "tests": []
     },
     {
       "id": 2,
-      "description": "Core Components & Logic",
+      "description": "Backend API Development (Express)",
       "tasks": [
         {
           "id": 1,
-          "description": "Todo Types & Custom State Hook",
+          "description": "Express Server Foundation",
           "details": [
-            "Define the 'Todo' interface in src/types.ts with id, text, and completed fields.",
-            "Implement useTodos custom hook in src/hooks/useTodos.ts to manage todo list state.",
-            "Add 'addTodo' functionality to the hook to append new items with unique IDs.",
-            "Add 'toggleTodo' functionality to the hook to flip the completion status.",
-            "Add 'deleteTodo' functionality to the hook to remove items by ID."
+            "Create src/server/app.ts to configure Express middleware (CORS, JSON parsing)",
+            "Implement a central error handling middleware in src/server/middleware/error.ts",
+            "Define the Todo interface and Zod schema in src/shared/types.ts",
+            "Create src/server/routes/todoRoutes.ts for routing logic",
+            "Implement a request logging middleware for better observability in src/server/middleware/logger.ts"
           ],
           "tests": [
-            "Should add a new todo to the state correctly",
-            "Should toggle a todo from incomplete to completed",
-            "Should remove a todo from the list by its ID",
-            "Should initialize with an empty array of todos"
+            "Router should correctly map defined paths to their respective handlers",
+            "Invalid routes should return 404 Not Found",
+            "Error handler should return formatted JSON for exceptions",
+            "CORS middleware should be present in the application stack"
           ],
           "completed": false
         },
         {
           "id": 2,
-          "description": "Implement AddTodo Component",
+          "description": "Todo Domain Logic and Repository",
           "details": [
-            "Create src/components/AddTodo.tsx as a controlled component with an input field.",
-            "Implement a form submission handler to prevent default browser behavior.",
-            "Add validation to prevent adding empty or whitespace-only todos.",
-            "Clear the input field after a successful todo addition.",
-            "Pass the 'addTodo' function as a prop from the parent component."
+            "Implement an in-memory Todo storage class in src/server/repository/todoRepository.ts",
+            "Add methods for Create, Read, Update, and Delete operations in the repository",
+            "Implement data seeding for initial development state",
+            "Ensure the repository handles 'not found' cases by throwing specific errors",
+            "Add filtering logic to the repository for completed/active states"
           ],
           "tests": [
-            "Should allow typing into the todo input field",
-            "Should call the addition callback when the form is submitted",
-            "Should clear the input field after clicking the add button",
-            "Should disable or ignore submission if the input is empty"
+            "Repository should correctly store and retrieve a todo item",
+            "Repository should update todo status correctly in memory",
+            "Repository should delete a todo and reflect change in the list",
+            "Repository should throw error when accessing a non-existent todo ID"
           ],
           "completed": false
         },
         {
           "id": 3,
-          "description": "Implement TodoList & TodoItem Components",
+          "description": "RESTful Todo Endpoints",
           "details": [
-            "Create src/components/TodoItem.tsx to render individual todo details.",
-            "Include a checkbox in TodoItem for toggling completion and a delete button.",
-            "Create src/components/TodoList.tsx to map over the array of todos.",
-            "Pass necessary callbacks (toggle, delete) from App.tsx down through TodoList.",
-            "Ensure each item in the list has a stable and unique 'key' prop."
+            "Create src/server/controllers/todoController.ts to handle request-response logic",
+            "Implement GET /api/todos to fetch all todos with optional filtering",
+            "Implement POST /api/todos with Zod validation for the request body",
+            "Implement PATCH /api/todos/:id for partial updates (toggle status, edit text)",
+            "Implement DELETE /api/todos/:id to remove a todo item"
           ],
           "tests": [
-            "Should render a list containing all current todos",
-            "Should display the correct text for each todo item",
-            "Should show a checkbox as checked if the todo is completed",
-            "Should call the delete callback when the delete button is clicked"
+            "POST /api/todos should return 201 and the created todo object",
+            "POST /api/todos should return 400 for invalid input schema",
+            "GET /api/todos should return an array of todos with 200 OK",
+            "PATCH /api/todos/:id should return the updated todo object",
+            "DELETE /api/todos/:id should return 204 No Content"
           ],
           "completed": false
         }
       ],
       "tests": [
-        "Adding a todo should update the displayed list immediately",
-        "Toggling a checkbox should strike through the text (if CSS applied)",
-        "Deleting a todo should remove it from the document"
+        "All CRUD operations should be functional and return appropriate status codes",
+        "API should enforce data integrity via Zod schema validation"
       ]
     },
     {
       "id": 3,
-      "description": "Features & Persistence",
+      "description": "Frontend Foundation and Logic (React)",
       "tasks": [
         {
           "id": 1,
-          "description": "LocalStorage Persistence",
+          "description": "React Entry Point and Core Layout",
           "details": [
-            "Modify useTodos hook to load the initial state from localStorage on mount.",
-            "Implement a useEffect hook to sync the todo state to localStorage on every change.",
-            "Add error handling for localStorage access (e.g., full storage or blocked access).",
-            "Ensure the state is serialized to JSON before storing.",
-            "Test that todos persist even after a simulated page refresh."
+            "Create src/client/main.tsx to bootstrap the React application",
+            "Implement src/client/App.tsx with a responsive layout structure",
+            "Create a central layout component in src/client/components/Layout.tsx",
+            "Set up global CSS variables for colors, spacing, and typography in src/client/index.css",
+            "Implement a Header component for the application title and branding"
           ],
           "tests": [
-            "Should save the todo list to localStorage whenever it changes",
-            "Should retrieve and display todos from localStorage on application start",
-            "Should handle empty localStorage by defaulting to an empty list"
+            "App component should render without crashing",
+            "Main layout elements (header, main container) should be present in the DOM",
+            "CSS variables should be correctly applied to the root element"
           ],
           "completed": false
         },
         {
           "id": 2,
-          "description": "Filtering Functionality",
+          "description": "API Client and State Management",
           "details": [
-            "Add filter state (All, Active, Completed) to src/App.tsx.",
-            "Implement logic to filter the displayed todos based on the selected filter.",
-            "Create src/components/Filters.tsx to render navigation/filter buttons.",
-            "Add a count of remaining active todos to be displayed near the filters.",
-            "Highlight the currently active filter button for visual feedback."
+            "Create src/client/services/api.ts for interacting with the backend using Fetch API",
+            "Implement custom React hooks (e.g., useTodos) for data fetching and mutations",
+            "Set up a TodoContext in src/client/context/TodoContext.tsx for global state management",
+            "Implement optimistic UI updates for better perceived performance",
+            "Add error handling and loading states within the context provider"
           ],
           "tests": [
-            "Should show only uncompleted todos when 'Active' filter is selected",
-            "Should show only completed todos when 'Completed' filter is selected",
-            "Should show all todos when 'All' filter is selected",
-            "Should update the 'items left' count correctly when todos are added/deleted"
-          ],
-          "completed": false
-        },
-        {
-          "id": 3,
-          "description": "Bulk Actions & Inline Editing",
-          "details": [
-            "Implement 'Clear Completed' button to remove all finished todos at once.",
-            "Update TodoItem to support double-click to enter edit mode.",
-            "Implement an input field in TodoItem for editing existing todo text.",
-            "Save changes on 'Enter' key press or when the input loses focus (blur).",
-            "Cancel editing and revert changes if the 'Escape' key is pressed."
-          ],
-          "tests": [
-            "Should remove all completed todos when 'Clear Completed' is clicked",
-            "Should switch to edit mode when a todo item is double-clicked",
-            "Should update the todo text after editing and pressing Enter",
-            "Should revert to original text if Escape is pressed during editing"
+            "API service should correctly call fetch with proper headers and JSON body",
+            "TodoContext should provide todos state to consumer components",
+            "Optimistic updates should immediately reflect in state before API resolution",
+            "Loading state should be active during initial data fetch"
           ],
           "completed": false
         }
       ],
       "tests": [
-        "Filtering should work correctly across different states",
-        "Todos should persist across browser sessions",
-        "Inline editing should properly update the state and localStorage"
+        "Frontend should correctly communicate with the backend API via the service layer",
+        "State changes in TodoContext should trigger re-renders in consumer components"
       ]
     },
     {
       "id": 4,
-      "description": "Styling & Optimization",
+      "description": "UI Components and Features",
       "tasks": [
         {
           "id": 1,
-          "description": "Production Styling & Responsive Design",
+          "description": "Todo List and Item Components",
           "details": [
-            "Implement a clean, modern UI using Vanilla CSS in src/App.css.",
-            "Apply responsive styles using media queries for mobile, tablet, and desktop.",
-            "Add CSS transitions for smooth hover states and state changes.",
-            "Use CSS variables for theme colors (background, primary, text).",
-            "Implement a visually distinct 'completed' state (e.g., grayed out, line-through)."
+            "Create src/client/components/TodoList.tsx to render the collection of todos",
+            "Implement src/client/components/TodoItem.tsx for individual todo display",
+            "Add interactive checkboxes for completion and buttons for deletion",
+            "Implement inline editing functionality for todo text",
+            "Ensure accessible labels and ARIA roles for all interactive elements"
           ],
           "tests": [
-            "Should have a layout that adjusts for small screen widths",
-            "Should display completed todos with a line-through decoration",
-            "Should have accessible color contrast for all text elements"
+            "TodoList should render the correct number of items from state",
+            "Clicking completion checkbox should trigger the toggle action in state",
+            "Clicking delete button should trigger the remove action in state",
+            "TodoItem should enter edit mode on double-click or edit button click"
           ],
           "completed": false
         },
         {
           "id": 2,
-          "description": "Accessibility & Keyboard Navigation",
+          "description": "Add Todo Form and List Filtering",
           "details": [
-            "Add semantic HTML tags (header, main, footer, section) for better screen reader support.",
-            "Ensure all interactive elements (buttons, inputs) have descriptive aria-labels.",
-            "Implement full keyboard navigation support (tab index, focus management).",
-            "Add 'Enter' key support for adding and editing todos without a mouse.",
-            "Verify the application is usable with standard accessibility tools."
+            "Create src/client/components/AddTodoForm.tsx with a controlled input and submit button",
+            "Implement form validation to prevent empty or whitespace-only todo items",
+            "Create src/client/components/TodoFilters.tsx for 'All', 'Active', and 'Completed' views",
+            "Add a 'Clear Completed' button to batch-remove finished tasks",
+            "Display an empty state message when no todos match the current filter"
           ],
           "tests": [
-            "Should allow adding a todo using only the keyboard",
-            "Should have focus indicators for all interactive elements",
-            "Should provide aria-labels for the delete and filter buttons"
-          ],
-          "completed": false
-        },
-        {
-          "id": 3,
-          "description": "Performance Optimization",
-          "details": [
-            "Use React.memo to prevent unnecessary re-renders of the TodoItem component.",
-            "Implement useCallback for toggle and delete handlers passed to TodoList.",
-            "Ensure expensive filtering operations are memoized using useMemo if necessary.",
-            "Analyze the component tree to minimize deep prop drilling where possible.",
-            "Run a production build and verify the bundle size is optimized."
-          ],
-          "tests": [
-            "Should not re-render unaffected todo items when a new one is added",
-            "Should maintain smooth performance with a large number of todos (e.g., 100+)",
-            "Should have a clean production build without console errors"
+            "Submitting the form with valid text should create a new todo item",
+            "Submitting an empty form should prevent action and show a validation error",
+            "Changing filters should update the visible list of todos based on status",
+            "Empty state should be visible when the filtered list length is zero"
           ],
           "completed": false
         }
       ],
       "tests": [
-        "The application should be fully accessible via keyboard",
-        "The UI should remain consistent and usable across different device sizes",
-        "Performance should be optimal even with frequent state updates"
+        "User should be able to perform all CRUD operations via the UI",
+        "Filtering and clearing completed tasks should work as expected"
+      ]
+    },
+    {
+      "id": 5,
+      "description": "Styling, Accessibility, and Final Polish",
+      "tasks": [
+        {
+          "id": 1,
+          "description": "Advanced Styling and Responsiveness",
+          "details": [
+            "Implement a modern, clean design using Vanilla CSS Flexbox and CSS Grid",
+            "Add CSS transitions for adding/removing items (fade-in, slide-out effects)",
+            "Ensure full responsiveness across mobile, tablet, and desktop viewports",
+            "Implement interactive hover, active, and focus states for all buttons and inputs",
+            "Add a dark mode theme toggle using CSS custom properties and media queries"
+          ],
+          "tests": [
+            "Layout should adjust correctly on mobile screen widths (breakdown of columns)",
+            "Interactive elements should have visible focus indicators for keyboard navigation",
+            "Animations should play when items are added or removed from the list",
+            "Color contrast should meet WCAG AA standards"
+          ],
+          "completed": false
+        },
+        {
+          "id": 2,
+          "description": "Performance Optimization and QA",
+          "details": [
+            "Audit application for accessibility (a11y) compliance using browser tools",
+            "Implement React.memo where necessary to prevent unnecessary list re-renders",
+            "Run final integration tests across the integrated frontend and backend",
+            "Perform a production build and verify asset optimization in the dist/ folder",
+            "Add project documentation (README.md) for setup and architecture details"
+          ],
+          "tests": [
+            "Application should achieve high scores in accessibility audits",
+            "Production build should successfully generate optimized JS and CSS bundles",
+            "All functional tests should pass in the production-like local environment"
+          ],
+          "completed": false
+        }
+      ],
+      "tests": [
+        "Final application should be responsive, accessible, and free of console errors",
+        "Build process should be streamlined and well-documented"
       ]
     }
   ]
