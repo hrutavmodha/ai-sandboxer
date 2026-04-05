@@ -1,65 +1,76 @@
-# 🤖 Three‑Agent Dev Workflow (ACL + Gemini CLI)
+# 🤖 Vibe‑Coded Multi‑Agent Dev Workflow (ACL + Gemini CLI)
 
-This script orchestrates three AI agents (Developer, Tester, Reviewer) using file‑system **ACLs** to physically isolate file access. Each agent runs a **Gemini CLI** prompt, and the workflow cycles to implement tasks, write tests, and review results.
-
-## 🧠 How It Works
-
-1. **Workflow Initialization**: The orchestrator ensures directories exist, configures the `gemini-agent` Git identity, and explicitly locks the `run.py` script so the AI cannot tamper with it.
-2. **Sequential Execution & Permission Flipping**: Permissions are dynamically set via `setfacl` before each agent runs, granting only the strictly required access to the `gemini-agent` user.
-   - **Developer** → reads `REVIEW.md` for bug fixes, otherwise picks the first unticked task from `TASKS.md` and implements code in `src/` and `index.html`.
-   - **Tester** → locked out of `src/`. It writes test cases in `tests/` based on `REVIEW.md` (bug reproduction) or the `Tests:` section of the current task.
-   - **Reviewer** → runs the test suite (`npx vitest run`). If tests fail, it writes bug details to `REVIEW.md`. If they pass, it marks the task as done in `TASKS.md`, clears `REVIEW.md`, and commits the changes.
-3. **Infinite Loop Protection**: At the start of every cycle, the orchestrator checks `REVIEW.md`. If the Reviewer outputs *"Found same bug again"*, the orchestrator immediately halts to prevent runaway API usage.
-4. **Cleanup**: Permissions are **restored** to the host user (`hrutav-modha`) after each iteration.
+A TypeScript‑based orchestrator that implements a robust, isolated software development lifecycle (SDLC) using multiple AI agents. It leverages the **Gemini CLI** for high‑level reasoning and **Linux Access Control Lists (ACLs)** to ensure a zero‑trust, deterministic execution environment.
 
 ---
 
-## ❌ The Problem It Solves
+## 🧠 Architectural Overview
 
-If you just tell an AI loop to "write code and then test it," it usually fails due to two major flaws:
+This system coordinates four specialized AI agents in a continuous loop, ensuring each task is planned, implemented, tested, and reviewed with minimal human intervention.
 
-- **Implementation Bias (The Tautology Problem):** If the Tester agent can read the Developer's source code, it writes tests tailored to perfectly match that exact *implementation* rather than the actual *specification* (`TASKS.md`). It simply rubber-stamps the code, including the bugs.
-- **LLM Laziness & Shortcut Seeking:** LLMs are notoriously lazy when left unchecked. During testing, they frequently write fake, guaranteed-to-pass assertions like `expect(true).toBe(true)` just to trick the orchestrator into a "success" state and break out of the loop.
+### 👥 The Agents
 
-Soft prompts like *"Please write rigorous black-box tests"* do not fix this behavior. We need a physical, deterministic boundary.
+1.  **Planner (`src/agents/planner/`)**: Analyzes the project goal and generates a structured roadmap in **`app/tasks.json`**. It identifies the necessary components and the testing strategy for each task.
+2.  **Developer (`src/agents/developer/`)**: Implements the code changes defined in the roadmap. It has write access to the source code but is strictly isolated from the test suite to prevent implementation bias.
+3.  **Tester (`src/agents/tester/`)**: Writes comprehensive tests based on the task specification and the project's validation schema. It is blinded from the Developer's implementation to ensure true black‑box testing.
+4.  **Reviewer (`src/agents/reviewer/`)**: Validates the Developer's work by running the test suite. If tests fail, it identifies bugs and provides feedback. If they pass, it marks the task as complete, cleans up, and commits the changes.
 
 ---
 
-## ✨ What’s Unique About This Approach
+## 🛡️ Security & Isolation: ACL‑Based Boundary
 
-This project solves those problems by:
+To solve the **Implementation Bias** and **LLM Laziness** problems, this project uses surgical **Linux ACLs** managed in **`src/acl.ts`**.
 
-- **Enforcing access policies with bare-metal Linux ACLs** – every agent runs under the same system user (`gemini-agent`), but the orchestrator dynamically toggles `setfacl` to blind them from each other.  
-- **No Docker Overhead** – It achieves zero-trust isolation natively on the host OS.
-- **Using a fixed‑format task file (`TASKS.md`)** with explicit test definitions, so agents don’t need to guess what “done” means.
+-   **Dynamic Permission Flipping**: Before each agent execution, the orchestrator flips permissions using `setfacl`.
+-   **Kernel‑Level Boundaries**: Agents run under a restricted system user (e.g., `gemini-agent`). The Developer cannot see the tests, the Tester cannot see the source, and the Reviewer only commits when the tests pass.
+-   **No Docker Overhead**: Achieves physical, deterministic isolation natively on the host OS.
 
-The result is a deterministic workflow: the Developer cannot see the tests, the Tester cannot see the source, and the Reviewer can only commit when the tests pass. 
+### 📁 File & Directory Access Model
 
-## 📁 File & Directory Access Model (Kernel-Level)
+| Agent      | `src/` | `tests/` | `app/tasks.json` | `app/REVIEW.md` | `.git/` | `node_modules/` |
+|------------|--------|----------|------------------|-----------------|---------|-----------------|
+| Developer  | rwx    | ---      | r                | r               | ---     | rx              |
+| Tester     | ---    | rwx      | r                | r               | ---     | rx              |
+| Reviewer   | rx     | rx       | rwx              | rwx             | rwx     | rx              |
 
-| Agent      | `src/` | `tests/` | `index.html` | `TASKS.md` | `REVIEW.md` | `.git/` | `run.py` | `node_modules/` |
-|------------|--------|----------|--------------|------------|-------------|---------|----------|-----------------|
-| Developer  | rwx    | ---      | rwx          | r          | r           | –       | ---      | rx              |
-| Tester     | ---    | rwx      | ---          | r          | r           | –       | ---      | rx              |
-| Reviewer   | rx     | rx       | r            | rwx        | rwx         | rwx     | ---      | rx              |
+-   **`---`** = Locked (No access)
+-   **`r` / `rx`** = Read / Read+Execute (Directories)
+-   **`rwx`** = Full read/write/execute access
 
-- **`---`** = Locked (No access)
-- **`r` / `rx`** = Read / Read+Execute (Directories)
-- **`rwx`** = Full read/write/execute access
+---
 
-## 📝 Example `TASKS.md` Format
+## 🚀 Getting Started
 
-`- [ ] Implement login endpoint`  
-`   Tests: Should return 200 with valid credentials, 401 with invalid`  
-`- [ ] Add input validation`  
-`   Tests: Should reject empty fields, enforce min length`
+### Prerequisites
 
-## ⚙️ Configuration
+-   **Linux OS** with ACL support (`setfacl`, `getfacl`).
+-   **Gemini CLI** installed and configured (e.g., in `/usr/local/nodejs/bin/gemini`).
+-   **Node.js & ts‑node** for running the orchestration script.
 
-- `MAX_CYCLES` – number of iterations (set to 1 in `run.py`, increase for multi‑step workflows).
-- **Gemini path** – change `/usr/local/nodejs/bin/gemini` if your CLI is installed elsewhere.
-- **Test command** – modify the `npx vitest run` line inside the Reviewer prompt if you use a different runner.
-- **Host User** – Update the `hrutav-modha` username in the `restore_permissions()` function to match your local Linux user.
+### Configuration
+
+Configuration is managed in **`app/vibe.config.ts`**. This file defines the agents, their commands, and custom instructions.
+
+### Running the Workflow
+
+Start the orchestrator with a project goal:
+
+```bash
+npx ts-node src/run.ts --prompt "Build a responsive todo list app with local storage"
+```
+
+---
+
+## 📂 Key Components
+
+-   **`src/run.ts`**: The main entry point.
+-   **`src/core/workflow.ts`**: Orchestration logic and state management.
+-   **`src/acl.ts`**: Logic for managing file‑system level isolation.
+-   **`src/core/runner.ts`**: Handles the execution of the Gemini CLI in headless mode.
+-   **`app/tasks.json`**: The persistent project roadmap.
+-   **`src/agents/`**: Contains the logic and specialized prompts for each agent.
+
+---
 
 ## 📄 License
 

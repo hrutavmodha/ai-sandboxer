@@ -20,7 +20,7 @@ import { spawnTesterAgent } from '../agents/tester/index.ts';
 import { spawnReviewerAgent } from '../agents/reviewer/index.ts';
 import { spawnPlannerAgent } from '../agents/planner/index.ts';
 
-const maximumCycles = 1;
+const maximumCycles = 10;
 
 /**
  * Ensures the operating system is supported for ACL-based isolation.
