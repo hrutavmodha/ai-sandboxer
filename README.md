@@ -1,4 +1,4 @@
-# 🤖 Vibe‑Coded Multi‑Agent Dev Workflow (ACL + Gemini CLI)
+# 🤖 Multi‑Agent Dev Workflow (ACL + Gemini CLI)
 
 A TypeScript‑based orchestrator that implements a robust, isolated software development lifecycle (SDLC) using multiple AI agents. It leverages the **Gemini CLI** for high‑level reasoning and **Linux Access Control Lists (ACLs)** to ensure a zero‑trust, deterministic execution environment.
 
